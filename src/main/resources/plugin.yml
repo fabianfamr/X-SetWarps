@@ -1,0 +1,61 @@
+name: X-SetWarps
+version: 1.2
+main: com.fabian.xsetwarps.XSetWarps
+author: Fabian
+description: Simple and organized warp plugin.
+softdepend: [PlaceholderAPI]
+folia-supported: true
+
+commands:
+  xsetwarp:
+    description: Main command for X-SetWarps
+    aliases: [xsw]
+    permission: xsetwarps.admin
+  setwarp:
+    description: Create a new warp
+    permission: xsetwarps.setwarp
+  warp:
+    description: Teleport to a warp
+    permission: xsetwarps.warp
+  delwarp:
+    description: Delete an existing warp
+    permission: xsetwarps.delwarp
+  warps:
+    description: List all warps or open GUI
+    permission: xsetwarps.warps
+  warpinfo:
+    description: Show information about a warp
+    permission: xsetwarps.warpinfo
+
+permissions:
+  xsetwarps.*:
+    description: All permissions for X-SetWarps
+    children:
+      xsetwarps.admin: true
+      xsetwarps.setwarp: true
+      xsetwarps.warp: true
+      xsetwarps.delwarp: true
+      xsetwarps.warps: true
+      xsetwarps.warpinfo: true
+      xsetwarps.bypass-limit: true
+  xsetwarps.admin:
+    description: Permission to use admin commands
+    default: op
+  xsetwarps.setwarp:
+    description: Permission to set warps
+    default: op
+  xsetwarps.warp:
+    description: Permission to use basic warp command
+    default: true
+  xsetwarps.delwarp:
+    description: Permission to delete warps
+    default: op
+  xsetwarps.warps:
+    description: Permission to list warps
+    default: true
+  xsetwarps.warpinfo:
+    description: Permission to see warp info
+    default: true
+  xsetwarps.bypass-limit:
+    description: Permission to bypass warp limit
+    default: op

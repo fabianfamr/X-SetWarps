@@ -1,0 +1,50 @@
+# +------------------------------------------------------+
+# |                  X-SetWarps Configuration            |
+# |                  General Settings                    |
+# +------------------------------------------------------+
+
+# Plugin Language
+# The plugin will look for files in /languages/<language>.yml
+# Available by default: EN, ES, PT, JA, RU, CUSTOM
+language: EN
+
+# Update Checker System
+updates:
+  # Check for updates when the plugin starts?
+  check: true
+  # Notify administrators (with xsetwarps.admin) when they join if an update is available?
+  notify-on-join: true
+
+# Command Settings
+commands:
+  # Should the help message be displayed if a command is used incorrectly?
+  help-message: true
+
+# Warp Settings
+warps:
+  # Maximum number of warps allowed on the server.
+  # Set to -1 for unlimited.
+  max-warps: -1
+  
+  # Enable individual permissions for each warp?
+  # Permission node: xsetwarps.warp.<name>
+  # If false, players only need xsetwarps.command.warp to access all warps.
+  per-warp-permission: true
+
+# Teleport Settings
+teleport:
+  # Cooldown in seconds between uses of the SAME warp.
+  # Set to 0 to disable cooldown.
+  cooldown: 0
+  
+  # Delay in seconds before the teleport takes effect.
+  # Set to 0 to teleport instantly.
+  delay: 0
+  
+  # Cancel the teleport delay if the player moves?
+  cancel-on-move: true
+  
+  # Movement tolerance.
+  # 0.1 is very sensitive (even looking around might cancel it).
+  # Increase this if you want players to be able to look around.
+  move-tolerance: 0.1

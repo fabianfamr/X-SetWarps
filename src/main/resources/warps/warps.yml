@@ -1,0 +1,29 @@
+# +------------------------------------------------------+
+# |                  X-SetWarps Data File                |
+# |                  Manual Editing Not Recommended      |
+# +------------------------------------------------------+
+# This file stores all warp locations. 
+# While manually editable, it is safer to use the /setwarp and /delwarp commands.
+
+# Format Explanation:
+# warp_name:
+#   world: <world_name>
+#   x: <x_coordinate>
+#   y: <y_coordinate>
+#   z: <z_coordinate>
+#   yaw: <horizontal_angle>
+#   pitch: <vertical_angle>
+#   description: <optional_text>
+#   creator: <uuid_of_creator>
+#   date: <timed_created>
+
+example_warp:
+  world: world
+  x: 0.0
+  y: 100.0
+  z: 0.0
+  yaw: 0.0
+  pitch: 0.0
+  description: "This is an example warp!"
+  creator: "Server"
+  date: "2026-03-14 12:00:00"

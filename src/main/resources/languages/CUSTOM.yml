@@ -1,0 +1,56 @@
+# X-SetWarps Language File
+# You can customize all messages here.
+# Supports color codes (&a, &b, etc.).
+
+# General Messages
+prefix: "&8[&bX-SetWarps&8] &7"
+no-permission: "%prefix%&cYou do not have permission to use this command."
+only-players: "%prefix%&cThis command can only be used by players."
+usage-setwarp: "%prefix%&cUsage: /setwarp <name> [description]"
+usage-warp: "%prefix%&cUsage: /warp <name>"
+usage-delwarp: "%prefix%&cUsage: /delwarp <name>"
+usage-warpinfo: "%prefix%&cUsage: /warpinfo <name>"
+
+# Warp Messages
+warp-set: "%prefix%&aWarp %warp% set!"
+warp-not-found: "%prefix%&cWarp %warp% not found!"
+warp-teleport: "%prefix%&aTeleporting to %warp%..."
+warp-deleted: "%prefix%&aWarp %warp% deleted!"
+world-not-loaded: "%prefix%&cWorld %world% not loaded!"
+reload-success: "%prefix%&aReloaded!"
+
+# New Feature Messages
+warp-cooldown: "%prefix%&cWait %seconds%s before using %warp%."
+warp-delay: "%prefix%&eTeleporting to %warp% in %seconds%s... Don't move."
+warp-delay-cancelled: "%prefix%&cCancelled!"
+warps-limit-reached: "%prefix%&cLimit reached: %limit%."
+warps-list-empty: "%prefix%&cNo warps!"
+warps-list-header: "&9&l--- Warps (%count%) ---"
+warps-list-entry: "&7- &b%warp% &8(&7World: &f%world%&8) &7- &f%desc%"
+
+# WarpInfo Messages
+warpinfo-header: "&9&l--- Info: %warp% ---"
+warpinfo-desc: "&7Desc: %desc%"
+warpinfo-world: "&7World: %world%"
+warpinfo-coords: "&7Coords: %coords%"
+warpinfo-creator: "&7Creator: %creator%"
+warpinfo-created: "&7Date: %date%"
+
+# Update Checker Messages
+update-check: "%prefix%&eChecking updates..."
+update-available: "%prefix%&eNew version: %latest%!"
+update-download: "%prefix%&eDownload: %url%"
+update-current: "%prefix%&aUp to date!"
+update-error: "%prefix%&cError!"
+version-info: "%prefix%&bVersion: %version%"
+
+# Help Messages
+help-header: "&9&l--- Custom Help ---"
+help-reload: "&b/xsw reload &f- Reload"
+help-update: "&b/xsw update &f- Update"
+help-version: "&b/xsw version &f- Version"
+help-setwarp: "&b/setwarp <name> [desc] &f- Set"
+help-warp: "&b/warp <name> &f- Warp"
+help-delwarp: "&b/delwarp <name> &f- Delete"
+help-warps: "&b/warps &f- List"
+help-warpinfo: "&b/warpinfo <name> &f- Info"
