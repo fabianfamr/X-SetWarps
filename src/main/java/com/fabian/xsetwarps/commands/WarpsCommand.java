@@ -6,6 +6,7 @@ import com.fabian.xsetwarps.model.Warp;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,16 +28,31 @@ public class WarpsCommand implements CommandExecutor {
             return true;
         }
 
-        if (plugin.getWarpManager().getWarpCount() == 0) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(lang.getMessage("only-players"));
+            return true;
+        }
+
+        Player player = (Player) sender;
+        
+        // If GUI is enabled, open the warps list GUI
+        if (plugin.getConfig().getBoolean("gui.enabled", true)) {
+            plugin.getGuiManager().openWarpsListGUI(player, 1);
+            return true;
+        }
+
+        // Fallback to text list if GUI disabled
+        if (plugin.getWarpManager().getTotalWarpCount() == 0) {
             sender.sendMessage(lang.getMessage(sender, "warps-list-empty"));
             return true;
         }
 
-        // Fallback: text list
         sender.sendMessage(lang.getMessage(sender, "warps-list-header",
-                "%count%", String.valueOf(plugin.getWarpManager().getWarpCount())));
+                "%count%", String.valueOf(plugin.getWarpManager().getTotalWarpCount())));
+        
         List<String> names = new ArrayList<>(plugin.getWarpManager().getWarpNames());
         Collections.sort(names);
+        
         for (String name : names) {
             Warp warp = plugin.getWarpManager().getWarp(name);
             if (warp != null) {

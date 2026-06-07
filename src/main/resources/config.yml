@@ -1,12 +1,30 @@
-# +------------------------------------------------------+
-# |                  X-SetWarps Configuration            |
-# |                  General Settings                    |
-# +------------------------------------------------------+
+# ==============================================================================
+#  __  __      ____       _  __        __                
+#  \ \/ /     / ___|  ___| |_\ \      / /_ _ _ __ _ __  ___ 
+#   \  /_____ \___ \ / _ \ __|\ \ /\ / / _` | '__| '_ \/ __|
+#   /  \_____|____) |  __/ |_  \ V  V / (_| | |  | |_) \__ \
+#  /_/\_\    |____/ \___|\__|  \_/\_/ \__,_|_|  | .__/|___/
+#                                               |_|         
+# ==============================================================================
+# X-SetWarps | Developed by Fabian (X Proyects)
+# Discord: https://discord.gg/Yb6GsfGWmd
+# Supported versions: 1.8.8 - 26.1+
+# ==============================================================================
 
 # Plugin Language
-# The plugin will look for files in /languages/<language>.yml
-# Available by default: EN, ES, PT, JA, RU, CUSTOM
-language: EN
+# The plugin will look for files in /messages/<language>.yml
+# Available by default: en, es, pt, ja, ru
+language: en
+
+# Prefix for all messages
+prefix: "&8[&bX-SetWarps&8] &7"
+
+# Metrics / bStats
+# Anonymous usage statistics to help improve the plugin.
+# Data collected: server version, player count, plugin version, warp count, config options.
+# No personal or sensitive data is collected. You can opt-out at any time.
+metrics:
+  enabled: true
 
 # Update Checker System
 updates:
@@ -28,8 +46,15 @@ warps:
   
   # Enable individual permissions for each warp?
   # Permission node: xsetwarps.warp.<name>
-  # If false, players only need xsetwarps.command.warp to access all warps.
-  per-warp-permission: true
+  # If false, players only need xsetwarps.warp to access warps without custom permission.
+  # IMPORTANT: Warps with a custom 'permission' field in warps.yml are ALWAYS
+  # protected by that permission, regardless of this setting.
+  per-warp-permission: false
+
+  # Warps with empty permission (permission: '') are accessible to everyone?
+  # true  = permission: '' means anyone with xsetwarps.warp can use it (public)
+  # false = permission: '' means players need xsetwarps.warp.<name> per-warp permission
+  empty-permission-public: true
 
 # Teleport Settings
 teleport:
@@ -47,4 +72,22 @@ teleport:
   # Movement tolerance.
   # 0.1 is very sensitive (even looking around might cancel it).
   # Increase this if you want players to be able to look around.
-  move-tolerance: 0.1
+  move-tolerance: 0.5
+
+  # Teleport Effects (Sounds)
+  effects:
+    # Enable teleport effects?
+    enabled: true
+    
+    # Sound settings
+    sound:
+      enabled: true
+      # Sound to play (1.8+ compatible names: ENDERMAN_TELEPORT, TELEPORT, etc.)
+      name: "ENDERMAN_TELEPORT"
+      volume: 1.0
+      pitch: 1.0
+
+# GUI Settings
+gui:
+  # Enable the GUI for warps? (Players will see a menu instead of text list)
+  enabled: true

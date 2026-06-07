@@ -1,8 +1,9 @@
 package com.fabian.xsetwarps.managers;
 
 import com.fabian.xsetwarps.XSetWarps;
+import com.fabian.xsetwarps.utils.ColorUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.md_5.bungee.api.ChatColor;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,11 +13,13 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LanguageManager {
     private final XSetWarps plugin;
-    private FileConfiguration langConfig;
-    private String langName;
+    private FileConfiguration messagesConfig;
+    private String currentLang;
 
     public LanguageManager(XSetWarps plugin) {
         this.plugin = plugin;
@@ -27,66 +30,115 @@ public class LanguageManager {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
 
-        // Fix typo 'lenguage' if it exists, otherwise use 'language'
-        this.langName = plugin.getConfig().contains("language") ? 
-                plugin.getConfig().getString("language") : 
-                plugin.getConfig().getString("lenguage", "EN");
+        // Get language from config (use lowercase for file names)
+        String lang = plugin.getConfig().getString("language", "en").toLowerCase();
 
-        // Ensure the folder exists
-        File langFolder = new File(plugin.getDataFolder(), "languages");
-        if (!langFolder.exists()) {
-            langFolder.mkdirs();
+        // Ensure the messages folder exists
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        if (!messagesFolder.exists()) {
+            messagesFolder.mkdirs();
         }
 
-        // List of default languages to export from JAR if they don't exist
-        String[] defaultLangs = { "EN", "ES", "PT", "JA", "RU", "CUSTOM" };
-        for (String lang : defaultLangs) {
-            File file = new File(langFolder, lang + ".yml");
+        // Export default messages files if they don't exist
+        String[] defaultLangs = { "en", "es", "pt", "ja", "ru" };
+        for (String l : defaultLangs) {
+            File file = new File(messagesFolder, l + ".yml");
             if (!file.exists()) {
                 try {
-                    plugin.saveResource("languages/" + lang + ".yml", false);
+                    plugin.saveResource("messages/" + l + ".yml", false);
                 } catch (Exception ignored) {
-                    // Resource doesn't exist in JAR, ignore
                 }
             }
         }
 
-        File langFile = new File(langFolder, langName + ".yml");
+        // Load the messages file
+        File messagesFile = new File(messagesFolder, lang + ".yml");
 
-        // If the user set a custom language that isn't in the JAR and doesn't exist on disk
-        if (!langFile.exists()) {
-            try {
-                plugin.saveResource("languages/" + langName + ".yml", false);
-            } catch (Exception e) {
-                // Not in JAR, using EN as fallback if it doesn't exist at all
-                if (!langName.equalsIgnoreCase("EN")) {
-                    plugin.getLogger().warning("Language file " + langName + ".yml not found! Falling back to EN.yml");
-                    this.langName = "EN";
-                    langFile = new File(langFolder, "EN.yml");
-                    if (!langFile.exists()) {
-                        plugin.saveResource("languages/EN.yml", false);
-                    }
+        // If the language file doesn't exist, fallback to English
+        if (!messagesFile.exists()) {
+            if (!lang.equalsIgnoreCase("en")) {
+                plugin.getLogger().warning("Language file " + lang + ".yml not found! Falling back to EN.");
+                lang = "en";
+                messagesFile = new File(messagesFolder, "en.yml");
+                if (!messagesFile.exists()) {
+                    plugin.saveResource("messages/en.yml", false);
                 }
             }
         }
 
-        this.langConfig = YamlConfiguration.loadConfiguration(langFile);
+        this.messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+        this.currentLang = lang.toUpperCase();
 
-        // Load defaults from jar if available
-        InputStream defLangStream = plugin.getResource("languages/" + langName + ".yml");
-        if (defLangStream != null) {
-            this.langConfig.setDefaults(
-                    YamlConfiguration.loadConfiguration(new InputStreamReader(defLangStream, StandardCharsets.UTF_8)));
+        // Load defaults from JAR if available
+        InputStream defStream = plugin.getResource("messages/" + lang + ".yml");
+        if (defStream != null) {
+            this.messagesConfig.setDefaults(
+                    YamlConfiguration.loadConfiguration(new InputStreamReader(defStream, StandardCharsets.UTF_8)));
         }
     }
 
-    public String getMessage(String key) {
-        String message = langConfig.getString(key);
-        if (message == null)
-            return "Missing key: " + key;
+    /**
+     * Get available language files
+     */
+    public List<String> getAvailableLanguages() {
+        List<String> langs = new ArrayList<>();
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        if (messagesFolder.exists() && messagesFolder.isDirectory()) {
+            File[] files = messagesFolder.listFiles((dir, name) -> name.endsWith(".yml"));
+            if (files != null) {
+                for (File f : files) {
+                    String name = f.getName();
+                    langs.add(name.replace(".yml", ""));
+                }
+            }
+        }
+        return langs;
+    }
 
-        String prefix = langConfig.getString("prefix", "");
-        return ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", prefix));
+    /**
+     * Change the language
+     */
+    public boolean setLanguage(String lang) {
+        String newLang = lang.toLowerCase();
+        List<String> available = getAvailableLanguages();
+
+        // Convert available languages to lowercase for comparison
+        List<String> availableLower = new ArrayList<>();
+        for (String l : available) {
+            availableLower.add(l.toLowerCase());
+        }
+
+        if (!availableLower.contains(newLang)) {
+            return false;
+        }
+
+        // Update config
+        plugin.getConfig().set("language", newLang);
+        plugin.saveConfig();
+
+        // Reload messages
+        this.currentLang = newLang.toUpperCase();
+        loadLanguage();
+
+        return true;
+    }
+
+    public String getCurrentLanguage() {
+        return currentLang;
+    }
+
+    public String getMessage(String key) {
+        String message = messagesConfig.getString(key);
+        if (message == null) {
+            return "Missing key: " + key;
+        }
+
+        // Get prefix from language file, fallback to config.yml
+        String prefix = messagesConfig.getString("prefix", plugin.getConfig().getString("prefix", ""));
+        String translated = ChatColor.translateAlternateColorCodes('&', message.replace("%prefix%", prefix));
+        
+        // Apply advanced colors (hex)
+        return ColorUtils.translateColors(translated);
     }
 
     public String getMessage(String key, String... placeholders) {
@@ -99,18 +151,18 @@ public class LanguageManager {
         return message;
     }
 
+    public String getMessage(CommandSender sender, String key, String... placeholders) {
+        if (sender instanceof Player) {
+            return getMessage((Player) sender, key, placeholders);
+        }
+        return getMessage(key, placeholders);
+    }
+
     public String getMessage(Player player, String key, String... placeholders) {
         String message = getMessage(key, placeholders);
         if (plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             return PlaceholderAPI.setPlaceholders(player, message);
         }
         return message;
-    }
-
-    public String getMessage(CommandSender sender, String key, String... placeholders) {
-        if (sender instanceof Player) {
-            return getMessage((Player) sender, key, placeholders);
-        }
-        return getMessage(key, placeholders);
     }
 }

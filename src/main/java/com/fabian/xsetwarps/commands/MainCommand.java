@@ -6,6 +6,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
+
 public class MainCommand implements CommandExecutor {
     private final XSetWarps plugin;
 
@@ -31,8 +33,9 @@ public class MainCommand implements CommandExecutor {
 
         switch (subCommand) {
             case "reload":
-                plugin.getWarpManager().loadWarps();
+                plugin.getWarpManager().loadAllWarps();
                 plugin.getLanguageManager().loadLanguage();
+                plugin.getGuiManager().reload();
                 sender.sendMessage(lang.getMessage("reload-success"));
                 break;
             case "update":
@@ -40,6 +43,9 @@ public class MainCommand implements CommandExecutor {
                 break;
             case "version":
                 sender.sendMessage(lang.getMessage("version-info", "%version%", plugin.getDescription().getVersion()));
+                break;
+            case "locate":
+                handleLocateCommand(sender, args);
                 break;
             default:
                 sendHelp(sender);
@@ -49,13 +55,41 @@ public class MainCommand implements CommandExecutor {
         return true;
     }
 
+    private void handleLocateCommand(CommandSender sender, String[] args) {
+        LanguageManager lang = plugin.getLanguageManager();
+
+        if (args.length < 2) {
+            // Show current language and list available
+            String current = plugin.getLanguageManager().getCurrentLanguage().toLowerCase();
+            List<String> available = plugin.getLanguageManager().getAvailableLanguages();
+            sender.sendMessage(lang.getMessage("language-changed", "%language%", current));
+            sender.sendMessage(lang.getMessage("language-list", "%list%", String.join(", ", available)));
+            return;
+        }
+
+        String newLang = args[1].toLowerCase();
+        boolean success = plugin.getLanguageManager().setLanguage(newLang);
+
+        if (success) {
+            String current = plugin.getLanguageManager().getCurrentLanguage().toLowerCase();
+            sender.sendMessage(lang.getMessage("language-changed", "%language%", current));
+        } else {
+            List<String> available = plugin.getLanguageManager().getAvailableLanguages();
+            sender.sendMessage(lang.getMessage("language-not-found", "%list%", String.join(", ", available)));
+        }
+    }
+
     private void sendHelp(CommandSender sender) {
         LanguageManager lang = plugin.getLanguageManager();
         sender.sendMessage(lang.getMessage("help-header"));
         sender.sendMessage(lang.getMessage("help-reload"));
         sender.sendMessage(lang.getMessage("help-update"));
         sender.sendMessage(lang.getMessage("help-version"));
+        sender.sendMessage(lang.getMessage("help-locate"));
         sender.sendMessage(lang.getMessage("help-setwarp"));
         sender.sendMessage(lang.getMessage("help-warp"));
+        sender.sendMessage(lang.getMessage("help-delwarp"));
+        sender.sendMessage(lang.getMessage("help-warps"));
+        sender.sendMessage(lang.getMessage("help-warpinfo"));
     }
 }

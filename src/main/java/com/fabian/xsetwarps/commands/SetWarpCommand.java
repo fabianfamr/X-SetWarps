@@ -7,6 +7,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+
 public class SetWarpCommand implements CommandExecutor {
     private final XSetWarps plugin;
 
@@ -33,19 +35,35 @@ public class SetWarpCommand implements CommandExecutor {
         }
 
         String warpName = args[0];
-
-        // Build optional description from remaining args
-        String description = "";
+        String identifier = Warp.DEFAULT_IDENTIFIER;
+        StringBuilder descriptionBuilder = new StringBuilder();
+        
+        // Parse arguments: [name] [identifier] [description...]
+        // If no identifier provided, use "warps" as default
         if (args.length >= 2) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 1; i < args.length; i++) {
-                if (i > 1) sb.append(" ");
-                sb.append(args[i]);
+            // Check if second arg is an identifier (file exists) or part of description
+            String potentialIdentifier = args[1].toLowerCase();
+            File identifierFile = new File(plugin.getDataFolder(), "warps/" + potentialIdentifier + ".yml");
+            
+            if (identifierFile.exists() || args[1].equalsIgnoreCase("warps")) {
+                // It's an identifier
+                identifier = potentialIdentifier;
+                // Remaining args are description
+                for (int i = 2; i < args.length; i++) {
+                    if (descriptionBuilder.length() > 0) descriptionBuilder.append(" ");
+                    descriptionBuilder.append(args[i]);
+                }
+            } else {
+                // It's part of description
+                for (int i = 1; i < args.length; i++) {
+                    if (descriptionBuilder.length() > 0) descriptionBuilder.append(" ");
+                    descriptionBuilder.append(args[i]);
+                }
             }
-            description = sb.toString();
         }
 
-        Warp warp = new Warp(warpName, player.getLocation(), description, player.getName());
+        String description = descriptionBuilder.toString();
+        Warp warp = new Warp(warpName, player.getLocation(), description, player.getName(), identifier);
         boolean saved = plugin.getWarpManager().saveWarp(warp);
 
         if (!saved) {

@@ -1,0 +1,67 @@
+# ==============================================================================
+#  __  __      ____       _  __        __                
+#  \ \/ /     / ___|  ___| |_\ \      / /_ _ _ __ _ __  ___ 
+#   \  /_____ \___ \ / _ \ __|\ \ /\ / / _` | '__| '_ \/ __|
+#   /  \_____|____) |  __/ |_  \ V  V / (_| | |  | |_) \__ \
+#  /_/\_\    |____/ \___|\__|  \_/\_/ \__,_|_|  | .__/|___/
+#                                                |_|         
+# ==============================================================================
+# X-SetWarps Mensajes
+
+# General Messages
+no-permission: "%prefix%&cNo tienes permiso para usar este comando."
+only-players: "%prefix%&cEste comando solo puede ser usado por jugadores."
+usage-setwarp: "%prefix%&cUso: /setwarp <nombre> [identificador] [descripcion]"
+usage-warp: "%prefix%&cUso: /warp <nombre>"
+usage-delwarp: "%prefix%&cUso: /delwarp <nombre>"
+usage-warpinfo: "%prefix%&cUso: /warpinfo <nombre>"
+
+# Warp Messages
+warp-set: "%prefix%&aWarp '&b%warp%&a' creado correctamente!"
+warp-not-found: "%prefix%&cEl warp '&b%warp%&c' no existe."
+warp-teleport: "%prefix%&aTeletransportado al warp: &b%warp%"
+warp-deleted: "%prefix%&aEl warp '&b%warp%&a' ha sido eliminado."
+world-not-loaded: "%prefix%&cError: El mundo '&b%world%&c' no esta cargado."
+reload-success: "%prefix%&aConfiguracion y mensajes recargados!"
+
+# Warp List Messages
+warp-cooldown: "%prefix%&cDebes esperar &e%seconds%s &cpara usar &b%warp%&c."
+warp-delay: "%prefix%&eTeletransportando a &b%warp% &een &a%seconds% &esegundos... No te muevas."
+warp-delay-cancelled: "%prefix%&cTeletransporte cancelado por movimiento."
+warps-limit-reached: "%prefix%&cLimite maximo de warps alcanzado (&e%limit%&c)."
+warps-list-empty: "%prefix%&cNo hay warps registrados."
+warps-list-header: "&9&l--- Warps (&b%count%&9) ---"
+warps-list-entry: "&7- &b%warp% &8(&7Mundo: &f%world%&8) &7- &f%desc%"
+
+# WarpInfo Messages
+warpinfo-header: "&9&l--- Info del Warp: &b%warp% ---"
+warpinfo-desc: "&7Descripcion: &f%desc%"
+warpinfo-world: "&7Mundo: &f%world%"
+warpinfo-coords: "&7Coordenadas: &f%coords%"
+warpinfo-creator: "&7Creado por: &f%creator%"
+warpinfo-created: "&7Fecha: &f%date%"
+
+# Update Checker Messages
+update-check: "%prefix%&eBuscando actualizaciones..."
+update-available: "%prefix%&eNueva version disponible! &7(&c%current%&7 -> &a%latest%&7)"
+update-download: "%prefix%&eDescargar: &b%url%"
+update-current: "%prefix%&aTienes la ultima version!"
+update-error: "%prefix%&cError al buscar actualizaciones."
+version-info: "%prefix%&bVersion de X-SetWarps: &a%version%"
+
+# Language Messages
+language-changed: "%prefix%&aIdioma cambiado a: &b%language%"
+language-not-found: "%prefix%&cIdioma no encontrado. Disponibles: %list%"
+language-list: "&aIdiomas disponibles: &f%list%"
+
+# Help Messages
+help-header: "&9&l--- Ayuda X-SetWarps ---"
+help-reload: "&b/xsw reload &f- Recargar"
+help-update: "&b/xsw update &f- Buscar actualizaciones"
+help-version: "&b/xsw version &f- Mostrar version"
+help-locate: "&b/xsw locate <idioma> &f- Cambiar idioma"
+help-setwarp: "&b/setwarp <nombre> [id] [desc] &f- Crear warp"
+help-warp: "&b/warp <nombre> &f- Teletransportarse"
+help-delwarp: "&b/delwarp <nombre> &f- Eliminar warp"
+help-warps: "&b/warps &f- Ver warps o abrir GUI"
+help-warpinfo: "&b/warpinfo <nombre> &f- Info del warp"

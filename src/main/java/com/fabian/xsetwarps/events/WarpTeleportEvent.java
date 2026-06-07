@@ -9,18 +9,6 @@ import org.bukkit.event.player.PlayerEvent;
 /**
  * Called just before a player is teleported to a warp.
  * Other plugins can listen to this event and cancel the teleport if needed.
- *
- * <pre>
- * {@code
- * @EventHandler
- * public void onWarpTeleport(WarpTeleportEvent event) {
- *     if (event.getWarp().getName().equals("pvp")) {
- *         event.getPlayer().sendMessage("You cannot use that warp!");
- *         event.setCancelled(true);
- *     }
- * }
- * }
- * </pre>
  */
 public class WarpTeleportEvent extends PlayerEvent implements Cancellable {
 

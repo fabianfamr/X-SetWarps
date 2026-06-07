@@ -4,7 +4,6 @@ import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.model.Warp;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
-import org.jetbrains.annotations.NotNull;
 
 public class PlaceholderHook extends PlaceholderExpansion {
     private final XSetWarps plugin;
@@ -14,17 +13,17 @@ public class PlaceholderHook extends PlaceholderExpansion {
     }
 
     @Override
-    public @NotNull String getIdentifier() {
+    public String getIdentifier() {
         return "xsetwarps";
     }
 
     @Override
-    public @NotNull String getAuthor() {
+    public String getAuthor() {
         return "Fabian";
     }
 
     @Override
-    public @NotNull String getVersion() {
+    public String getVersion() {
         return plugin.getDescription().getVersion();
     }
 
@@ -34,9 +33,9 @@ public class PlaceholderHook extends PlaceholderExpansion {
     }
 
     @Override
-    public String onRequest(OfflinePlayer player, @NotNull String params) {
+    public String onRequest(OfflinePlayer player, String params) {
         if (params.equalsIgnoreCase("total")) {
-            return String.valueOf(plugin.getWarpManager().getWarpCount());
+            return String.valueOf(plugin.getWarpManager().getTotalWarpCount());
         }
 
         if (player == null) return null;

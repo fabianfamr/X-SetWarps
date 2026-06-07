@@ -13,9 +13,10 @@
 #   z: <z_coordinate>
 #   yaw: <horizontal_angle>
 #   pitch: <vertical_angle>
+#   permission: <optional_permission_node>
 #   description: <optional_text>
-#   creator: <uuid_of_creator>
-#   date: <timed_created>
+#   created-by: <player_name>
+#   created-at: <timestamp>
 
 example_warp:
   world: world
@@ -24,6 +25,7 @@ example_warp:
   z: 0.0
   yaw: 0.0
   pitch: 0.0
+  permission: ""
   description: "This is an example warp!"
-  creator: "Server"
-  date: "2026-03-14 12:00:00"
+  created-by: "Server"
+  created-at: 1715520000000

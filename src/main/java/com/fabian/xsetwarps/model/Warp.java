@@ -15,10 +15,21 @@ public class Warp {
     private String description;
     private String createdBy;
     private long createdAt;
+    private String category; // Identifier for the warp file (e.g., "spawns", "crates")
+    private String permission;
+
+    // Default identifier for the main warps file
+    public static final String DEFAULT_IDENTIFIER = "warps";
 
     // Constructor used when loading from YAML (full data)
     public Warp(String name, String worldName, double x, double y, double z, float yaw, float pitch,
                 String description, String createdBy, long createdAt) {
+        this(name, worldName, x, y, z, yaw, pitch, description, createdBy, createdAt, DEFAULT_IDENTIFIER);
+    }
+
+    // Constructor used when loading from YAML with category
+    public Warp(String name, String worldName, double x, double y, double z, float yaw, float pitch,
+                String description, String createdBy, long createdAt, String category) {
         this.name = name;
         this.worldName = worldName;
         this.x = x;
@@ -29,10 +40,17 @@ public class Warp {
         this.description = description != null ? description : "";
         this.createdBy = createdBy != null ? createdBy : "unknown";
         this.createdAt = createdAt > 0 ? createdAt : System.currentTimeMillis();
+        this.category = category;
+        this.permission = "";
     }
 
     // Constructor used when creating a new warp in-game
     public Warp(String name, Location loc, String description, String creatorName) {
+        this(name, loc, description, creatorName, DEFAULT_IDENTIFIER);
+    }
+
+    // Constructor used when creating a new warp in-game with category
+    public Warp(String name, Location loc, String description, String creatorName, String category) {
         this.name = name;
         this.worldName = loc.getWorld().getName();
         this.x = loc.getX();
@@ -43,6 +61,8 @@ public class Warp {
         this.description = description != null ? description : "";
         this.createdBy = creatorName;
         this.createdAt = System.currentTimeMillis();
+        this.category = category;
+        this.permission = "";
     }
 
     // Legacy constructor for backwards compatibility
@@ -52,7 +72,7 @@ public class Warp {
 
     // Legacy constructor for backwards compatibility (loading old warps.yml without new fields)
     public Warp(String name, String worldName, double x, double y, double z, float yaw, float pitch) {
-        this(name, worldName, x, y, z, yaw, pitch, "", "unknown", System.currentTimeMillis());
+        this(name, worldName, x, y, z, yaw, pitch, "", "unknown", System.currentTimeMillis(), DEFAULT_IDENTIFIER);
     }
 
     public String getName() { return name; }
@@ -76,4 +96,11 @@ public class Warp {
 
     public String getCreatedBy() { return createdBy; }
     public long getCreatedAt()   { return createdAt; }
+
+    // Getter and setter for identifier (file name without .yml)
+    public String getCategory() { return category != null ? category : "default"; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getPermission() { return permission; }
+    public void setPermission(String permission) { this.permission = permission != null ? permission : ""; }
 }
