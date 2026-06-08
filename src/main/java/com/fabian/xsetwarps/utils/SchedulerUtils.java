@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 
 public class SchedulerUtils {
 
-    private static final boolean IS_FOLIA = isClass("io.papermc.paper.threadedregionschedulers.RegionScheduler");
+    private static final boolean IS_FOLIA = isClass("io.papermc.paper.threadedregions.RegionScheduler");
 
     public static void runTask(XSetWarps plugin, Runnable runnable) {
         if (IS_FOLIA) {

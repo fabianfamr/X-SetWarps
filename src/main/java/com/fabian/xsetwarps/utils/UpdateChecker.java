@@ -29,12 +29,13 @@ public class UpdateChecker {
 
     public void checkForUpdates(CommandSender sender) {
         SchedulerUtils.runTaskAsync(plugin, () -> {
+            HttpURLConnection connection = null;
             try {
                 String current = plugin.getDescription().getVersion();
 
                 // Spigot API for resource versions
                 URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceId);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("User-Agent", "Fabian/X-SetWarps/" + current);
                 connection.setConnectTimeout(5000);
@@ -54,15 +55,19 @@ public class UpdateChecker {
                         sender.sendMessage(lang.getMessage("update-available", "%current%", current, "%latest%", latestVersion));
                         sender.sendMessage(lang.getMessage("update-download", "%url%", getDownloadUrl()));
                     } else {
-                        Bukkit.getConsoleSender()
-                                .sendMessage(lang.getMessage("update-available", "%current%", current, "%latest%", latestVersion));
-                        Bukkit.getConsoleSender().sendMessage(lang.getMessage("update-download", "%url%", getDownloadUrl()));
+                        SchedulerUtils.runTask(plugin, () -> {
+                            Bukkit.getConsoleSender()
+                                    .sendMessage(lang.getMessage("update-available", "%current%", current, "%latest%", latestVersion));
+                            Bukkit.getConsoleSender().sendMessage(lang.getMessage("update-download", "%url%", getDownloadUrl()));
+                        });
                     }
                 } else {
                     if (sender != null) {
                         sender.sendMessage(lang.getMessage("update-current"));
                     } else {
-                        Bukkit.getConsoleSender().sendMessage(lang.getMessage("update-current"));
+                        SchedulerUtils.runTask(plugin, () -> {
+                            Bukkit.getConsoleSender().sendMessage(lang.getMessage("update-current"));
+                        });
                     }
                 }
 
@@ -70,7 +75,13 @@ public class UpdateChecker {
                 if (sender != null) {
                     sender.sendMessage(plugin.getLanguageManager().getMessage("update-error"));
                 } else {
-                    Bukkit.getConsoleSender().sendMessage(plugin.getLanguageManager().getMessage("update-error"));
+                    SchedulerUtils.runTask(plugin, () -> {
+                        Bukkit.getConsoleSender().sendMessage(plugin.getLanguageManager().getMessage("update-error"));
+                    });
+                }
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
                 }
             }
         });
@@ -89,12 +100,23 @@ public class UpdateChecker {
     }
 
     private boolean isNewer(String current, String latest) {
+        if (current == null || latest == null) return false;
         String[] currentParts = current.replace("v", "").split("\\.");
         String[] latestParts = latest.replace("v", "").split("\\.");
         int length = Math.max(currentParts.length, latestParts.length);
         for (int i = 0; i < length; i++) {
-            int currentPart = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
-            int latestPart = i < latestParts.length ? Integer.parseInt(latestParts[i]) : 0;
+            int currentPart = 0;
+            int latestPart = 0;
+            try {
+                currentPart = i < currentParts.length ? Integer.parseInt(currentParts[i].replaceAll("[^0-9].*", "")) : 0;
+            } catch (NumberFormatException e) {
+                currentPart = 0;
+            }
+            try {
+                latestPart = i < latestParts.length ? Integer.parseInt(latestParts[i].replaceAll("[^0-9].*", "")) : 0;
+            } catch (NumberFormatException e) {
+                latestPart = 0;
+            }
             if (latestPart > currentPart)
                 return true;
             if (latestPart < currentPart)
