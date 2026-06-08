@@ -17,6 +17,7 @@ public class Warp {
     private long createdAt;
     private String category; // Identifier for the warp file (e.g., "spawns", "crates")
     private String permission;
+    private int cooldown; // Individual per-warp cooldown in seconds (-1 = use global default)
 
     // Default identifier for the main warps file
     public static final String DEFAULT_IDENTIFIER = "warps";
@@ -42,6 +43,7 @@ public class Warp {
         this.createdAt = createdAt > 0 ? createdAt : System.currentTimeMillis();
         this.category = category;
         this.permission = "";
+        this.cooldown = -1; // -1 means use global default from config
     }
 
     // Constructor used when creating a new warp in-game
@@ -63,6 +65,7 @@ public class Warp {
         this.createdAt = System.currentTimeMillis();
         this.category = category;
         this.permission = "";
+        this.cooldown = -1;
     }
 
     // Legacy constructor for backwards compatibility
@@ -103,4 +106,21 @@ public class Warp {
 
     public String getPermission() { return permission; }
     public void setPermission(String permission) { this.permission = permission != null ? permission : ""; }
+
+    /**
+     * Returns the per-warp cooldown in seconds.
+     * -1 means use the global default from config (teleport.cooldown).
+     * 0 means no cooldown for this specific warp.
+     * Any positive value overrides the global cooldown for this warp only.
+     */
+    public int getCooldown() { return cooldown; }
+    public void setCooldown(int cooldown) { this.cooldown = cooldown; }
+
+    /**
+     * Returns the effective cooldown in seconds for this warp,
+     * resolving -1 to the provided global default value.
+     */
+    public int getEffectiveCooldown(int globalDefault) {
+        return cooldown < 0 ? globalDefault : cooldown;
+    }
 }

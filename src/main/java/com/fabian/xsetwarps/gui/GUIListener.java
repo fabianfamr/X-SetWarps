@@ -97,23 +97,28 @@ public class GUIListener implements Listener {
             // empty-permission-public: true → no extra check, anyone can use it
         }
 
-        int cooldownSeconds = plugin.getConfig().getInt("teleport.cooldown", 0);
+        // Per-warp cooldown check (respects warp-specific cooldown)
+        int globalCooldownSetting = plugin.getConfig().getInt("teleport.cooldown", 0);
+        int cooldownSeconds = warp.getEffectiveCooldown(globalCooldownSetting);
         CooldownManager cooldownManager = plugin.getCooldownManager();
-        if (cooldownManager.isOnCooldown(player.getUniqueId(), warpName, cooldownSeconds)) {
-            long remaining = cooldownManager.getRemainingSeconds(player.getUniqueId(), warpName, cooldownSeconds);
-            player.sendMessage(lang.getMessage(player, "warp-cooldown",
-                    "%warp%", warp.getName(),
-                    "%seconds%", String.valueOf(remaining)));
-            return;
-        }
 
-        // Global cooldown check
-        int globalCooldownSeconds = plugin.getConfig().getInt("teleport.global-cooldown", 0);
-        if (cooldownManager.isOnGlobalCooldown(player.getUniqueId(), globalCooldownSeconds)) {
-            long remaining = cooldownManager.getGlobalRemainingSeconds(player.getUniqueId(), globalCooldownSeconds);
-            player.sendMessage(lang.getMessage(player, "warp-global-cooldown", "%seconds%",
-                    String.valueOf(remaining)));
-            return;
+        if (!player.hasPermission("xsetwarps.bypass.cooldown")) {
+            if (cooldownManager.isOnCooldown(player.getUniqueId(), warpName, cooldownSeconds)) {
+                long remaining = cooldownManager.getRemainingSeconds(player.getUniqueId(), warpName, cooldownSeconds);
+                player.sendMessage(lang.getMessage(player, "warp-cooldown",
+                        "%warp%", warp.getName(),
+                        "%seconds%", String.valueOf(remaining)));
+                return;
+            }
+
+            // Global cooldown check
+            int globalCooldownSeconds = plugin.getConfig().getInt("teleport.global-cooldown", 0);
+            if (cooldownManager.isOnGlobalCooldown(player.getUniqueId(), globalCooldownSeconds)) {
+                long remaining = cooldownManager.getGlobalRemainingSeconds(player.getUniqueId(), globalCooldownSeconds);
+                player.sendMessage(lang.getMessage(player, "warp-global-cooldown", "%seconds%",
+                        String.valueOf(remaining)));
+                return;
+            }
         }
 
         SchedulerUtils.runTask(plugin, () -> player.closeInventory());
@@ -201,7 +206,9 @@ public class GUIListener implements Listener {
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) return;
 
-        int cooldownSeconds = plugin.getConfig().getInt("teleport.cooldown", 0);
+        // Register per-warp cooldown (respects warp-specific cooldown)
+        int globalCooldownSetting = plugin.getConfig().getInt("teleport.cooldown", 0);
+        int cooldownSeconds = warp.getEffectiveCooldown(globalCooldownSetting);
         if (cooldownSeconds > 0) {
             plugin.getCooldownManager().setCooldown(player.getUniqueId(), warp.getName());
         }

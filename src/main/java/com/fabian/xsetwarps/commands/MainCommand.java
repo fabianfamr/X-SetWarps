@@ -7,6 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
+import java.util.Map;
 
 public class MainCommand implements CommandExecutor {
     private final XSetWarps plugin;
@@ -61,6 +62,12 @@ public class MainCommand implements CommandExecutor {
             case "import-cmi":
                 handleImportCMICommand(sender);
                 break;
+            case "import-all":
+                handleImportAllCommand(sender);
+                break;
+            case "setwarpcooldown":
+                handleSetWarpCooldown(sender, args);
+                break;
             default:
                 sendHelp(sender);
                 break;
@@ -103,6 +110,8 @@ public class MainCommand implements CommandExecutor {
         sender.sendMessage(lang.getMessage("help-export"));
         sender.sendMessage(lang.getMessage("help-import"));
         sender.sendMessage(lang.getMessage("help-import-plugins"));
+        sender.sendMessage(lang.getMessage("help-import-all"));
+        sender.sendMessage(lang.getMessage("help-setwarpcooldown"));
         sender.sendMessage(lang.getMessage("help-setwarp"));
         sender.sendMessage(lang.getMessage("help-warp"));
         sender.sendMessage(lang.getMessage("help-delwarp"));
@@ -172,6 +181,76 @@ public class MainCommand implements CommandExecutor {
             sender.sendMessage(lang.getMessage(sender, "import-cmi-not-found"));
         } else {
             sender.sendMessage(lang.getMessage(sender, "import-file-not-found", "%file%", "CMI/warps.yml"));
+        }
+    }
+
+    private void handleImportAllCommand(CommandSender sender) {
+        LanguageManager lang = plugin.getLanguageManager();
+
+        Map<String, Integer> results = plugin.getWarpManager().importFromAllPlugins();
+        if (results.isEmpty()) {
+            sender.sendMessage(lang.getMessage(sender, "import-all-no-plugins"));
+            return;
+        }
+
+        int total = 0;
+        for (Map.Entry<String, Integer> entry : results.entrySet()) {
+            int count = entry.getValue();
+            if (count >= 0) {
+                sender.sendMessage(lang.getMessage(sender, "import-all-result", "%plugin%", entry.getKey(), "%count%", String.valueOf(count)));
+                total += count;
+            } else if (count == -1) {
+                sender.sendMessage(lang.getMessage(sender, "import-file-not-found", "%file%", entry.getKey() + "/warps.yml"));
+            }
+        }
+
+        if (total > 0) {
+            plugin.getWarpManager().loadAllWarps();
+            sender.sendMessage(lang.getMessage(sender, "import-success", "%count%", String.valueOf(total)));
+        }
+    }
+
+    private void handleSetWarpCooldown(CommandSender sender, String[] args) {
+        LanguageManager lang = plugin.getLanguageManager();
+
+        if (args.length < 3) {
+            sender.sendMessage(lang.getMessage(sender, "usage-setwarpcooldown"));
+            return;
+        }
+
+        String warpName = args[1];
+        String cooldownStr = args[2];
+        int cooldown;
+
+        if (cooldownStr.equalsIgnoreCase("default") || cooldownStr.equalsIgnoreCase("-1")) {
+            cooldown = -1; // Use global default
+        } else {
+            try {
+                cooldown = Integer.parseInt(cooldownStr);
+                if (cooldown < -1) {
+                    sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-invalid"));
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-invalid"));
+                return;
+            }
+        }
+
+        com.fabian.xsetwarps.model.Warp warp = plugin.getWarpManager().getWarp(warpName);
+        if (warp == null) {
+            sender.sendMessage(lang.getMessage(sender, "warp-not-found", "%warp%", warpName));
+            return;
+        }
+
+        warp.setCooldown(cooldown);
+        // Re-save the warp to persist the change
+        plugin.getWarpManager().saveWarp(warp);
+
+        if (cooldown == -1) {
+            sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-reset", "%warp%", warp.getName()));
+        } else {
+            sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-set", "%warp%", warp.getName(), "%seconds%", String.valueOf(cooldown)));
         }
     }
 }

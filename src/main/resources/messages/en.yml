@@ -80,7 +80,19 @@ import-cmi-not-found: "%prefix%&cCMI plugin is not installed."
 # Global Cooldown
 warp-global-cooldown: "%prefix%&cYou must wait &e%seconds%s &cbefore using any warp."
 
+# Per-Warp Cooldown (admin command)
+usage-setwarpcooldown: "%prefix%&cUsage: /xsetwarp setwarpcooldown <warp> <seconds|default>"
+setwarpcooldown-set: "%prefix%&aWarp '&b%warp%&a' cooldown set to &e%seconds%s."
+setwarpcooldown-reset: "%prefix%&aWarp '&b%warp%&a' cooldown reset to global default."
+setwarpcooldown-invalid: "%prefix%&cInvalid cooldown value. Use a number >= 0 or 'default'."
+
 # Help additions
 help-export: "&b/xsw export <file> [id] &f- Export warps to file"
 help-import: "&b/xsw import <file> &f- Import warps from file"
 help-import-plugins: "&b/xsw import-essentials &f- Import from Essentials"
+help-import-all: "&b/xsw import-all &f- Import warps from all installed plugins"
+help-setwarpcooldown: "&b/xsw setwarpcooldown <warp> <s> &f- Set per-warp cooldown"
+
+# Import All
+import-all-no-plugins: "%prefix%&cNo supported warp plugins found on the server."
+import-all-result: "%prefix%&aFrom %plugin%: imported &e%count% &awarps."

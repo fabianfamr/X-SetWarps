@@ -30,13 +30,25 @@ public class WarpTabCompleter implements TabCompleter {
                 return completions;
             }
             if (args.length == 1) {
-                List<String> subCommands = Arrays.asList("reload", "update", "version", "locate", "export", "import", "import-essentials", "import-cmi");
+                List<String> subCommands = Arrays.asList("reload", "update", "version", "locate",
+                        "export", "import", "import-essentials", "import-cmi", "import-all",
+                        "setwarpcooldown");
                 StringUtil.copyPartialMatches(args[0], subCommands, completions);
                 Collections.sort(completions);
             } else if (args.length == 2 && args[0].equalsIgnoreCase("locate")) {
                 // Get available languages dynamically (lowercase)
                 List<String> languages = plugin.getLanguageManager().getAvailableLanguages();
                 StringUtil.copyPartialMatches(args[1], languages, completions);
+                Collections.sort(completions);
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("setwarpcooldown")) {
+                // Suggest warp names
+                for (Warp warp : plugin.getWarpManager().getAllWarps()) {
+                    completions.add(warp.getName());
+                }
+                StringUtil.copyPartialMatches(args[1], completions, completions);
+                Collections.sort(completions);
+            } else if (args.length == 3 && args[0].equalsIgnoreCase("setwarpcooldown")) {
+                StringUtil.copyPartialMatches(args[2], Arrays.asList("default", "0", "5", "10", "30", "60"), completions);
                 Collections.sort(completions);
             }
             return completions;

@@ -67,3 +67,29 @@ help-warp: "&b/warp <名前> &f- テレポート"
 help-delwarp: "&b/delwarp <名前> &f- 削除"
 help-warps: "&b/warps &f- リスト"
 help-warpinfo: "&b/warpinfo <名前> &f- 情報"
+
+# Export/Import
+usage-export: "%prefix%&c使用法: /xsetwarp export <ファイル> [識別子]"
+usage-import: "%prefix%&c使用法: /xsetwarp import <ファイル>"
+export-success: "%prefix%&a&e%count% &aワープを &b%file% &aにエクスポートしました"
+export-failed: "%prefix%&cワープのエクスポートに失敗しました"
+import-success: "%prefix%&a&e%count% &aワープをインポートしました！"
+import-file-not-found: "%prefix%&cファイルが見つかりません: &b%file%"
+import-essentials-not-found: "%prefix%&cEssentialsプラグインがインストールされていません"
+import-cmi-not-found: "%prefix%&cCMIプラグインがインストールされていません"
+
+warp-global-cooldown: "%prefix%&c&e%seconds%秒 &c待ってからワープを使用してください"
+
+usage-setwarpcooldown: "%prefix%&c使用法: /xsetwarp setwarpcooldown <ワープ> <秒数|default>"
+setwarpcooldown-set: "%prefix%&aワープ '&b%warp%&a' のクールダウンを &e%seconds%秒 &aに設定しました"
+setwarpcooldown-reset: "%prefix%&aワープ '&b%warp%&a' のクールダウンをデフォルトに戻しました"
+setwarpcooldown-invalid: "%prefix%&c無効な値です。0以上の数字または'default'を使用してください"
+
+help-export: "&b/xsw export <file> [id] &f- エクスポート"
+help-import: "&b/xsw import <file> &f- インポート"
+help-import-plugins: "&b/xsw import-essentials &f- Essentialsからインポート"
+help-import-all: "&b/xsw import-all &f- 全プラグインからインポート"
+help-setwarpcooldown: "&b/xsw setwarpcooldown <warp> <s> &f- ワープ毎のクールダウン"
+
+import-all-no-plugins: "%prefix%&c対応するワーププラグインが見つかりません"
+import-all-result: "%prefix%&a%plugin%から: &e%count% &aワープをインポートしました"

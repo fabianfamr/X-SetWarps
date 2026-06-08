@@ -58,7 +58,8 @@ warps:
 
 # Teleport Settings
 teleport:
-  # Cooldown in seconds between uses of the SAME warp.
+  # Default cooldown in seconds between uses of the SAME warp.
+  # This is the global default used when a warp does not have its own cooldown set.
   # Set to 0 to disable cooldown.
   cooldown: 0
   

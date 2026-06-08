@@ -1,10 +1,10 @@
 name: X-SetWarps
-version: 1.3
+version: 1.4
 main: com.fabian.xsetwarps.XSetWarps
 author: Fabian
 description: Advanced warp plugin with GUI support and multi-file warps. Requires 1.13+ (uses XSeries for cross-version material/sound compatibility).
 api-version: "1.13"
-softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI, Essentials, CMI]
 folia-supported: true
 
 commands:
@@ -42,6 +42,7 @@ permissions:
       xsetwarps.warpgui: true
       xsetwarps.warpinfo: true
       xsetwarps.bypass-limit: true
+      xsetwarps.bypass-cooldown: true
   xsetwarps.admin:
     description: Permission to use admin commands
     default: op
@@ -50,6 +51,7 @@ permissions:
       xsetwarps.delwarp: true
       xsetwarps.warpinfo: true
       xsetwarps.warp.*: true
+      xsetwarps.bypass-cooldown: true
   xsetwarps.setwarp:
     description: Permission to set warps
     default: op
@@ -71,6 +73,9 @@ permissions:
   xsetwarps.warpinfo:
     description: Permission to see warp info
     default: true
+  xsetwarps.bypass-cooldown:
+    description: Permission to bypass all warp cooldowns (per-warp and global)
+    default: op
   xsetwarps.bypass-limit:
     description: Permission to bypass warp limit
     default: op
