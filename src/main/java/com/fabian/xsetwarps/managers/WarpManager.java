@@ -414,7 +414,8 @@ public class WarpManager {
             if (section == null) continue;
 
             String worldName = section.getString("world", "world");
-            if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(worldName))) {
+            final String wnCheck = worldName;
+            if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(wnCheck))) {
                 worldName = Bukkit.getWorlds().get(0).getName();
             }
             double x = section.getDouble("x");
@@ -471,7 +472,8 @@ public class WarpManager {
                 float yaw = Float.parseFloat(parts[4]);
                 float pitch = parts.length > 5 ? Float.parseFloat(parts[5]) : 0;
 
-                if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(worldName))) {
+                final String wnCheck = worldName;
+                if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(wnCheck))) {
                     worldName = Bukkit.getWorlds().get(0).getName();
                 }
 
@@ -511,7 +513,7 @@ public class WarpManager {
             float yaw = 0, pitch = 0;
 
             try {
-                if (section != null && section.contains("X", true)) {
+                if (section != null && (section.isSet("X") || section.isSet("x"))) {
                     // Section-based format (CMI-style)
                     worldName = section.getString("World", section.getString("world", "world"));
                     x = section.getDouble("X", section.getDouble("x", 0));
@@ -533,7 +535,8 @@ public class WarpManager {
                     pitch = parts.length > 5 ? Float.parseFloat(parts[5]) : 0;
                 }
 
-                if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(worldName))) {
+                final String wnCheck = worldName;
+                if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(wnCheck))) {
                     worldName = Bukkit.getWorlds().get(0).getName();
                 }
 
@@ -599,7 +602,8 @@ public class WarpManager {
             float yaw = (float) section.getDouble("Yaw", section.getDouble("yaw", 0));
             float pitch = (float) section.getDouble("Pitch", section.getDouble("pitch", 0));
 
-            if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(worldName))) {
+            final String wnCheck = worldName;
+            if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(wnCheck))) {
                 worldName = Bukkit.getWorlds().get(0).getName();
             }
 

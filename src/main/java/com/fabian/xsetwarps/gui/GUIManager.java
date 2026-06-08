@@ -428,6 +428,8 @@ public class GUIManager {
     private void applySkullTexture(SkullMeta meta, String base64Texture) {
         if (base64Texture == null || base64Texture.isEmpty()) return;
 
+        // Use reflection-only approach for cross-version compatibility
+        // (org.bukkit.profile.PlayerProfile does not exist in 1.16.5 API)
         try {
             // Try Paper API (PlayerProfile) - available on Paper 1.14+
             Object profile = Bukkit.class.getMethod("createProfile", UUID.class, String.class)
@@ -437,34 +439,20 @@ public class GUIManager {
             Object property = propertyClass.getConstructor(String.class, String.class)
                     .newInstance("textures", base64Texture);
             profileClass.getMethod("setProperty", propertyClass).invoke(profile, property);
-            meta.setPlayerProfile((org.bukkit.profile.PlayerProfile) profile);
+            // Use reflection to call setPlayerProfile to avoid compile-time dependency
+            meta.getClass().getMethod("setPlayerProfile", profileClass).invoke(meta, profile);
         } catch (Exception e) {
-            try {
-                // Try Bukkit PlayerProfile API (1.20.4+)
-                org.bukkit.profile.PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
-                // Use reflection for PlayerProfile.setProperty in newer Bukkit API
-                try {
-                    Class<?> propertyClass = Class.forName("org.bukkit.profile.PlayerProfile");
-                    // In 1.20.4+, textures are set via textures property
-                    java.util.Properties textures = new java.util.Properties();
-                    // Fallback to legacy GameProfile approach via reflection
-                    setSkullViaGameProfile(meta, base64Texture);
-                } catch (Exception ex) {
-                    plugin.getLogger().warning("Failed to apply skull texture: " + e.getClass().getSimpleName());
-                }
-            } catch (Exception ex2) {
-                // Final fallback: try GameProfile via reflection (works on all versions)
-                setSkullViaGameProfile(meta, base64Texture);
-            }
+            // Fallback: try GameProfile via reflection (works on all versions)
+            setSkullViaGameProfile(meta, base64Texture);
         }
     }
 
     private void applySkullPlayer(SkullMeta meta, String playerName) {
         try {
-            // Try Paper/Bukkit PlayerProfile API first
+            // Try Paper PlayerProfile API via reflection (avoids compile dependency on 1.20.2+ API)
             Object profile = Bukkit.class.getMethod("createProfile", UUID.class, String.class)
                     .invoke(null, (UUID) null, playerName);
-            meta.setPlayerProfile((org.bukkit.profile.PlayerProfile) profile);
+            meta.getClass().getMethod("setPlayerProfile", profile.getClass()).invoke(meta, profile);
         } catch (Exception e) {
             // Fallback to deprecated setOwner (works on all versions)
             meta.setOwner(playerName);
