@@ -16,9 +16,9 @@ public class DependencyManager {
     }
 
     public void loadDependencies() {
-        plugin.getLogger().info("Iniciando carga de dependencias con Libby...");
+        plugin.getLogger().info("Loading dependencies with Libby...");
         libraryManager.addMavenCentral();
-        libraryManager.addJitPack(); // Importante para XSeries
+        libraryManager.addJitPack(); // Important for XSeries
 
         // Define Adventure and MiniMessage libraries
         Library minimessage = Library.builder()
@@ -59,19 +59,19 @@ public class DependencyManager {
 
         // Load libraries
         try {
-            plugin.getLogger().info("Descargando Adventure API...");
+            plugin.getLogger().info("Downloading Adventure API...");
             libraryManager.loadLibrary(api);
             libraryManager.loadLibrary(key);
             libraryManager.loadLibrary(gson);
             libraryManager.loadLibrary(minimessage);
             libraryManager.loadLibrary(legacy);
             
-            plugin.getLogger().info("Descargando XSeries...");
+            plugin.getLogger().info("Downloading XSeries...");
             libraryManager.loadLibrary(xseries);
             
-            plugin.getLogger().info("¡Todas las dependencias han sido cargadas con éxito!");
+            plugin.getLogger().info("All dependencies loaded successfully!");
         } catch (Exception e) {
-            plugin.getLogger().severe("Error al cargar las dependencias: " + e.getMessage());
+            plugin.getLogger().severe("Failed to load dependencies: " + e.getMessage());
             e.printStackTrace();
         }
     }

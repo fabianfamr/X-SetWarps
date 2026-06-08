@@ -27,7 +27,7 @@ public class XSetWarps extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        getLogger().info("=== PRE-CARGA DE X-SETWARPS INICIADA ===");
+        getLogger().info("X-SetWarps Pre-Load Started...");
         new DependencyManager(this).loadDependencies();
     }
 
@@ -126,8 +126,14 @@ public class XSetWarps extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        getServer().getConsoleSender()
-                .sendMessage(ChatColor.translateAlternateColorCodes('&', "&8[&bX-SetWarps&8] &rhas been disabled."));
+        String version = getDescription().getVersion();
+
+        getServer().getConsoleSender().sendMessage(
+                ColorUtils.translateColors("&8[&bX-SetWarps&8] &3----------------------------------------------"));
+        getServer().getConsoleSender().sendMessage(
+                ColorUtils.translateColors("&8[&bX-SetWarps&8]   &cDisabled v" + version + "! Goodbye."));
+        getServer().getConsoleSender().sendMessage(
+                ColorUtils.translateColors("&8[&bX-SetWarps&8] &3----------------------------------------------"));
     }
 
     public WarpManager getWarpManager() {
