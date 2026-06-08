@@ -3,6 +3,7 @@ version: 1.3
 main: com.fabian.xsetwarps.XSetWarps
 author: Fabian
 description: Advanced warp plugin with GUI support and multi-file warps. Supports Minecraft 1.8.8+ (uses XSeries for cross-version material/sound compatibility).
+api-version: "1.13"
 softdepend: [PlaceholderAPI, Essentials, CMI]
 folia-supported: true
 
