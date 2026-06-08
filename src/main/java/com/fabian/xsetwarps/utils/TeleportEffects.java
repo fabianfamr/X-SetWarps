@@ -47,7 +47,10 @@ public class TeleportEffects {
         
         try {
             XSound sound = XSound.matchXSound(soundName).orElse(XSound.ENTITY_ENDERMAN_TELEPORT);
-            sound.parseSound().ifPresent(s -> loc.getWorld().playSound(loc, s, soundVolume, soundPitch));
+            org.bukkit.Sound parsed = sound.parseSound();
+            if (parsed != null) {
+                loc.getWorld().playSound(loc, parsed, soundVolume, soundPitch);
+            }
         } catch (Exception e) {
             // Fallback: try direct Sound enum (1.13+)
             try {
