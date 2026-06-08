@@ -74,8 +74,6 @@ export-success: "%prefix%&aExportados &e%count% &awarps para &b%file%"
 export-failed: "%prefix%&cFalha ao exportar warps."
 import-success: "%prefix%&aImportados &e%count% &awarps com sucesso!"
 import-file-not-found: "%prefix%&cArquivo nao encontrado: &b%file%"
-import-essentials-not-found: "%prefix%&cO plugin Essentials nao esta instalado."
-import-cmi-not-found: "%prefix%&cO plugin CMI nao esta instalado."
 import-plugin-not-found: "%prefix%&cO plugin %plugin% nao esta instalado."
 import-plugin-success: "%prefix%&aImportados &e%count% &awarps de %plugin%."
 
@@ -88,8 +86,6 @@ setwarpcooldown-invalid: "%prefix%&cValor de cooldown invalido. Use um numero >=
 
 help-export: "&b/xsw export <arquivo> [id] &f- Exportar warps"
 help-import: "&b/xsw import <arquivo|essentials|cmi|all> &f- Importar warps"
-help-import-plugins: "&b/xsw import-essentials &f- Importar do Essentials"
-help-import-all: "&b/xsw import-all &f- Importar warps de todos os plugins"
 help-setwarpcooldown: "&b/xsw setwarpcooldown <warp> <s> &f- Cooldown por warp"
 
 import-all-no-plugins: "%prefix%&cNenhum plugin de warps compativel encontrado."

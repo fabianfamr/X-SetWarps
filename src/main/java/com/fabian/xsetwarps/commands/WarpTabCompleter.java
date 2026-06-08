@@ -26,12 +26,21 @@ public class WarpTabCompleter implements TabCompleter {
         
         // Handle xsetwarp subcommands
         if (command.getName().equalsIgnoreCase("xsetwarp")) {
-            if (!sender.hasPermission("xsetwarps.admin")) {
-                return completions;
-            }
             if (args.length == 1) {
-                List<String> subCommands = Arrays.asList("reload", "update", "version", "locate",
-                        "export", "import", "setwarpcooldown");
+                List<String> subCommands = new ArrayList<>();
+                boolean isAdmin = sender.hasPermission("xsetwarps.admin");
+                boolean canExport = isAdmin || sender.hasPermission("xsetwarps.export");
+                boolean canImport = isAdmin || sender.hasPermission("xsetwarps.import");
+
+                if (isAdmin) {
+                    subCommands.addAll(Arrays.asList("reload", "update", "version", "locate", "setwarpcooldown"));
+                }
+                if (canExport) {
+                    subCommands.add("export");
+                }
+                if (canImport) {
+                    subCommands.add("import");
+                }
                 StringUtil.copyPartialMatches(args[0], subCommands, completions);
                 Collections.sort(completions);
             } else if (args.length == 2) {

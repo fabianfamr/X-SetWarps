@@ -43,8 +43,10 @@ permissions:
       xsetwarps.warpinfo: true
       xsetwarps.bypass-limit: true
       xsetwarps.bypass-cooldown: true
+      xsetwarps.export: true
+      xsetwarps.import: true
   xsetwarps.admin:
-    description: Permission to use admin commands
+    description: Permission to use admin commands (reload, update, version, locate, setwarpcooldown, help)
     default: op
     children:
       xsetwarps.setwarp: true
@@ -52,6 +54,14 @@ permissions:
       xsetwarps.warpinfo: true
       xsetwarps.warp.*: true
       xsetwarps.bypass-cooldown: true
+      xsetwarps.export: true
+      xsetwarps.import: true
+  xsetwarps.export:
+    description: Permission to export warps to a YAML file (/xsetwarp export <file> [identifier])
+    default: op
+  xsetwarps.import:
+    description: Permission to import warps from files or other plugins (/xsetwarp import <file|essentials|cmi|all>)
+    default: op
   xsetwarps.setwarp:
     description: Permission to set warps
     default: op

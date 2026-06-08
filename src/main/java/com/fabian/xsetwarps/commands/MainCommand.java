@@ -24,17 +24,42 @@ public class MainCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         LanguageManager lang = plugin.getLanguageManager();
 
-        if (!sender.hasPermission("xsetwarps.admin")) {
-            sender.sendMessage(lang.getMessage("no-permission"));
-            return true;
-        }
-
         if (args.length == 0) {
+            if (!sender.hasPermission("xsetwarps.admin")) {
+                sender.sendMessage(lang.getMessage("no-permission"));
+                return true;
+            }
             sendHelp(sender);
             return true;
         }
 
         String subCommand = args[0].toLowerCase();
+
+        // export and import have their own dedicated permissions (admin OR specific perm)
+        switch (subCommand) {
+            case "export":
+                if (!sender.hasPermission("xsetwarps.admin") && !sender.hasPermission("xsetwarps.export")) {
+                    sender.sendMessage(lang.getMessage("no-permission"));
+                    return true;
+                }
+                handleExportCommand(sender, args);
+                return true;
+            case "import":
+                if (!sender.hasPermission("xsetwarps.admin") && !sender.hasPermission("xsetwarps.import")) {
+                    sender.sendMessage(lang.getMessage("no-permission"));
+                    return true;
+                }
+                handleImportCommand(sender, args);
+                return true;
+            default:
+                break;
+        }
+
+        // All other subcommands require xsetwarps.admin
+        if (!sender.hasPermission("xsetwarps.admin")) {
+            sender.sendMessage(lang.getMessage("no-permission"));
+            return true;
+        }
 
         switch (subCommand) {
             case "reload":
@@ -53,12 +78,6 @@ public class MainCommand implements CommandExecutor {
                 break;
             case "locate":
                 handleLocateCommand(sender, args);
-                break;
-            case "export":
-                handleExportCommand(sender, args);
-                break;
-            case "import":
-                handleImportCommand(sender, args);
                 break;
             case "setwarpcooldown":
                 handleSetWarpCooldown(sender, args);
