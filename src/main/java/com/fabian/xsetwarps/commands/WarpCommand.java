@@ -79,6 +79,15 @@ public class WarpCommand implements CommandExecutor {
             return true;
         }
 
+        // Global cooldown check
+        int globalCooldownSeconds = plugin.getConfig().getInt("teleport.global-cooldown", 0);
+        if (cooldownManager.isOnGlobalCooldown(player.getUniqueId(), globalCooldownSeconds)) {
+            long remaining = cooldownManager.getGlobalRemainingSeconds(player.getUniqueId(), globalCooldownSeconds);
+            player.sendMessage(lang.getMessage(player, "warp-global-cooldown", "%seconds%",
+                    String.valueOf(remaining)));
+            return true;
+        }
+
         // Delay check
         int delaySeconds = plugin.getConfig().getInt("teleport.delay", 0);
         if (delaySeconds > 0) {
@@ -159,6 +168,12 @@ public class WarpCommand implements CommandExecutor {
         int cooldownSeconds = plugin.getConfig().getInt("teleport.cooldown", 0);
         if (cooldownSeconds > 0) {
             plugin.getCooldownManager().setCooldown(player.getUniqueId(), warp.getName());
+        }
+
+        // Register global cooldown
+        int globalCooldownSeconds = plugin.getConfig().getInt("teleport.global-cooldown", 0);
+        if (globalCooldownSeconds > 0) {
+            plugin.getCooldownManager().setGlobalCooldown(player.getUniqueId());
         }
 
         // Play departure effects

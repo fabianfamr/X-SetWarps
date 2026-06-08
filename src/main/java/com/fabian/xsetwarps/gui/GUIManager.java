@@ -40,6 +40,8 @@ public class GUIManager {
     private int prevPageSlot;
     private int nextPageSlot;
 
+    private boolean usePlayerHeads;
+
     private boolean pageInfoEnabled;
     private int pageInfoSlot;
     private String pageInfoMaterial;
@@ -87,6 +89,7 @@ public class GUIManager {
 
         guiTitle = ColorUtils.translateColors(config.getString("gui.title", "&8Warps"));
         guiRows = config.getInt("gui.rows", 4);
+        usePlayerHeads = config.getBoolean("gui.use-player-heads", false);
 
         fillerMaterial = config.getString("filler.material", "BLACK_STAINED_GLASS_PANE");
         fillerName = ColorUtils.translateColors(config.getString("filler.name", " "));
@@ -357,9 +360,20 @@ public class GUIManager {
         if (warp.getDescription() != null && !warp.getDescription().isEmpty()) {
             lore.add(ColorUtils.translateColors("&7" + warp.getDescription()));
         }
+        if (warp.getCreatedBy() != null && !warp.getCreatedBy().equals("unknown")) {
+            lore.add(ColorUtils.translateColors("&7Created by: &f" + warp.getCreatedBy()));
+        }
         lore.add(ColorUtils.translateColors("&7Click to teleport!"));
 
-        ItemStack item = XMaterial.ENDER_PEARL.parseItem();
+        ItemStack item;
+        if (usePlayerHeads && warp.getCreatedBy() != null && !warp.getCreatedBy().equals("unknown")) {
+            item = buildSkullItem("PLAYER_HEAD", null, warp.getCreatedBy());
+            if (item == null) {
+                item = XMaterial.ENDER_PEARL.parseItem();
+            }
+        } else {
+            item = XMaterial.ENDER_PEARL.parseItem();
+        }
         if (item == null) return null;
 
         ItemMeta meta = item.getItemMeta();

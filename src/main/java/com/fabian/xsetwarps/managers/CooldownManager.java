@@ -14,6 +14,9 @@ public class CooldownManager {
     // UUID -> (warpName -> timestamp of last use)
     private final Map<UUID, Map<String, Long>> cooldowns = new HashMap<>();
 
+    // UUID -> timestamp of last ANY warp use
+    private final Map<UUID, Long> globalCooldowns = new HashMap<>();
+
     /**
      * Returns true if the player is still on cooldown for the given warp.
      */
@@ -61,9 +64,39 @@ public class CooldownManager {
     }
 
     /**
+     * Returns true if the player is still on global cooldown for ANY warp.
+     */
+    public boolean isOnGlobalCooldown(UUID uuid, int cooldownSeconds) {
+        if (cooldownSeconds <= 0) return false;
+        Long lastUse = globalCooldowns.get(uuid);
+        if (lastUse == null) return false;
+        return (System.currentTimeMillis() - lastUse) < (cooldownSeconds * 1000L);
+    }
+
+    /**
+     * Returns the remaining global cooldown in seconds (0 if not on cooldown).
+     */
+    public long getGlobalRemainingSeconds(UUID uuid, int cooldownSeconds) {
+        if (cooldownSeconds <= 0) return 0;
+        Long lastUse = globalCooldowns.get(uuid);
+        if (lastUse == null) return 0;
+        long elapsed = System.currentTimeMillis() - lastUse;
+        long remaining = (cooldownSeconds * 1000L) - elapsed;
+        return remaining > 0 ? (remaining / 1000) + 1 : 0;
+    }
+
+    /**
+     * Registers a global warp use for the given player.
+     */
+    public void setGlobalCooldown(UUID uuid) {
+        globalCooldowns.put(uuid, System.currentTimeMillis());
+    }
+
+    /**
      * Clears all cooldowns for a player (e.g. on disconnect).
      */
     public void clearCooldowns(UUID uuid) {
         cooldowns.remove(uuid);
+        globalCooldowns.remove(uuid);
     }
 }
