@@ -1,9 +1,8 @@
 package com.fabian.xsetwarps.utils;
 
 import com.fabian.xsetwarps.XSetWarps;
-import org.bukkit.Bukkit;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -47,10 +46,16 @@ public class TeleportEffects {
         if (!enabled || !soundEnabled || loc.getWorld() == null) return;
         
         try {
-            Sound sound = Sound.valueOf(soundName);
-            loc.getWorld().playSound(loc, sound, soundVolume, soundPitch);
-        } catch (IllegalArgumentException e) {
-            loc.getWorld().playSound(loc, Sound.valueOf("ENTITY_ENDERMAN_TELEPORT"), soundVolume, soundPitch);
+            XSound sound = XSound.matchXSound(soundName).orElse(XSound.ENTITY_ENDERMAN_TELEPORT);
+            sound.parseSound().ifPresent(s -> loc.getWorld().playSound(loc, s, soundVolume, soundPitch));
+        } catch (Exception e) {
+            // Fallback: try direct Sound enum (1.13+)
+            try {
+                org.bukkit.Sound fallback = org.bukkit.Sound.valueOf("ENTITY_ENDERMAN_TELEPORT");
+                loc.getWorld().playSound(loc, fallback, soundVolume, soundPitch);
+            } catch (Exception ex) {
+                plugin.getLogger().warning("Failed to play teleport sound: " + soundName);
+            }
         }
     }
     
@@ -81,7 +86,7 @@ public class TeleportEffects {
         
         // Schedule arrival sound
         final Location dest = player.getLocation().clone();
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        SchedulerUtils.runAtEntityLater(plugin, player, () -> {
             if (player.isOnline()) {
                 playTeleportOut(dest);
             }

@@ -33,9 +33,11 @@ public class MainCommand implements CommandExecutor {
 
         switch (subCommand) {
             case "reload":
+                plugin.reloadConfig();
                 plugin.getWarpManager().loadAllWarps();
                 plugin.getLanguageManager().loadLanguage();
                 plugin.getGuiManager().reload();
+                plugin.getTeleportEffects().loadSettings();
                 sender.sendMessage(lang.getMessage("reload-success"));
                 break;
             case "update":

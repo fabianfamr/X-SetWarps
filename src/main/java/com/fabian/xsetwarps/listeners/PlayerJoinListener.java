@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerJoinListener implements Listener {
     private final XSetWarps plugin;
@@ -30,5 +31,13 @@ public class PlayerJoinListener implements Listener {
                 player.sendMessage(lang.getMessage("update-download", "%url%", plugin.getUpdateChecker().getDownloadUrl()));
             }
         }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        // Clean up cooldown data for disconnected players to prevent memory leaks
+        plugin.getCooldownManager().clearCooldowns(event.getPlayer().getUniqueId());
+        // Clean up GUI data
+        plugin.getGuiManager().cleanupPlayer(event.getPlayer());
     }
 }

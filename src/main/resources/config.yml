@@ -82,8 +82,9 @@ teleport:
     # Sound settings
     sound:
       enabled: true
-      # Sound to play (1.8+ compatible names: ENDERMAN_TELEPORT, TELEPORT, etc.)
-      name: "ENDERMAN_TELEPORT"
+      # Sound to play. Uses XSound for cross-version compatibility.
+      # Examples: ENTITY_ENDERMAN_TELEPORT, ENDERMAN_TELEPORT, ENTITY_PLAYER_LEVELUP
+      name: "ENTITY_ENDERMAN_TELEPORT"
       volume: 1.0
       pitch: 1.0
 

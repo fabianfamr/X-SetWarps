@@ -6,9 +6,6 @@ import com.fabian.xsetwarps.utils.ColorUtils;
 
 import com.cryptomorin.xseries.XMaterial;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
-import com.destroystokyo.paper.profile.ProfileProperty;
-
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -39,6 +36,9 @@ public class GUIManager {
     private String closeTexture;
     private String closeName;
     private List<String> closeLore;
+
+    private int prevPageSlot;
+    private int nextPageSlot;
 
     private boolean pageInfoEnabled;
     private int pageInfoSlot;
@@ -97,6 +97,9 @@ public class GUIManager {
         closeName = ColorUtils.translateColors(config.getString("buttons.close.name", "&fClose"));
         closeLore = translateLore(config.getStringList("buttons.close.lore"));
 
+        prevPageSlot = config.getInt("navigation.prev-page.slot", 27);
+        nextPageSlot = config.getInt("navigation.next-page.slot", 35);
+
         pageInfoEnabled = config.getBoolean("page-info.enabled", false);
         pageInfoSlot = config.getInt("page-info.slot", 31);
         pageInfoMaterial = config.getString("page-info.material", "PAPER");
@@ -152,6 +155,8 @@ public class GUIManager {
 
         Set<Integer> occupiedSlots = new HashSet<>();
         occupiedSlots.add(closeSlot);
+        occupiedSlots.add(prevPageSlot);
+        occupiedSlots.add(nextPageSlot);
         if (pageInfoEnabled) {
             occupiedSlots.add(pageInfoSlot);
         }
@@ -256,14 +261,12 @@ public class GUIManager {
             if (prevItem != null) {
                 ItemMeta meta = prevItem.getItemMeta();
                 if (meta != null) {
-                    meta.setDisplayName(ColorUtils.translateColors("&e&l« Previous Page"));
+                    meta.setDisplayName(ColorUtils.translateColors("&e&l\u00ab Previous Page"));
                     meta.setLore(Collections.singletonList(
                             ColorUtils.translateColors("&7Page " + (currentPage - 1) + " of " + totalPages)));
                     prevItem.setItemMeta(meta);
                 }
-            }
-            if (prevItem != null) {
-                inv.setItem(27, prevItem);
+                inv.setItem(prevPageSlot, prevItem);
             }
         }
 
@@ -272,14 +275,12 @@ public class GUIManager {
             if (nextItem != null) {
                 ItemMeta meta = nextItem.getItemMeta();
                 if (meta != null) {
-                    meta.setDisplayName(ColorUtils.translateColors("&e&lNext Page »"));
+                    meta.setDisplayName(ColorUtils.translateColors("&e&lNext Page \u00bb"));
                     meta.setLore(Collections.singletonList(
                             ColorUtils.translateColors("&7Page " + (currentPage + 1) + " of " + totalPages)));
                     nextItem.setItemMeta(meta);
                 }
-            }
-            if (nextItem != null) {
-                inv.setItem(35, nextItem);
+                inv.setItem(nextPageSlot, nextItem);
             }
         }
     }
@@ -403,8 +404,7 @@ public class GUIManager {
         if (skullTexture != null && !skullTexture.isEmpty()) {
             applySkullTexture(meta, skullTexture);
         } else if (skullPlayer != null && !skullPlayer.isEmpty()) {
-            PlayerProfile profile = Bukkit.createProfile(null, skullPlayer);
-            meta.setPlayerProfile(profile);
+            applySkullPlayer(meta, skullPlayer);
         }
 
         skull.setItemMeta(meta);
@@ -415,11 +415,70 @@ public class GUIManager {
         if (base64Texture == null || base64Texture.isEmpty()) return;
 
         try {
-            PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID(), "CustomHead");
-            profile.setProperty(new ProfileProperty("textures", base64Texture));
-            meta.setPlayerProfile(profile);
+            // Try Paper API (PlayerProfile) - available on Paper 1.14+
+            Object profile = Bukkit.class.getMethod("createProfile", UUID.class, String.class)
+                    .invoke(null, UUID.randomUUID(), "CustomHead");
+            Class<?> profileClass = profile.getClass();
+            Class<?> propertyClass = Class.forName("com.destroystokyo.paper.profile.ProfileProperty");
+            Object property = propertyClass.getConstructor(String.class, String.class)
+                    .newInstance("textures", base64Texture);
+            profileClass.getMethod("setProperty", propertyClass).invoke(profile, property);
+            meta.setPlayerProfile((org.bukkit.profile.PlayerProfile) profile);
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to apply skull texture: " + e.getClass().getSimpleName());
+            try {
+                // Try Bukkit PlayerProfile API (1.20.4+)
+                org.bukkit.profile.PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "CustomHead");
+                // Use reflection for PlayerProfile.setProperty in newer Bukkit API
+                try {
+                    Class<?> propertyClass = Class.forName("org.bukkit.profile.PlayerProfile");
+                    // In 1.20.4+, textures are set via textures property
+                    java.util.Properties textures = new java.util.Properties();
+                    // Fallback to legacy GameProfile approach via reflection
+                    setSkullViaGameProfile(meta, base64Texture);
+                } catch (Exception ex) {
+                    plugin.getLogger().warning("Failed to apply skull texture: " + e.getClass().getSimpleName());
+                }
+            } catch (Exception ex2) {
+                // Final fallback: try GameProfile via reflection (works on all versions)
+                setSkullViaGameProfile(meta, base64Texture);
+            }
+        }
+    }
+
+    private void applySkullPlayer(SkullMeta meta, String playerName) {
+        try {
+            // Try Paper/Bukkit PlayerProfile API first
+            Object profile = Bukkit.class.getMethod("createProfile", UUID.class, String.class)
+                    .invoke(null, (UUID) null, playerName);
+            meta.setPlayerProfile((org.bukkit.profile.PlayerProfile) profile);
+        } catch (Exception e) {
+            // Fallback to deprecated setOwner (works on all versions)
+            meta.setOwner(playerName);
+        }
+    }
+
+    private void setSkullViaGameProfile(SkullMeta meta, String base64Texture) {
+        try {
+            // Reflection-based GameProfile approach for maximum compatibility
+            Class<?> gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
+            Object gameProfile = gameProfileClass.getConstructor(UUID.class, String.class)
+                    .newInstance(UUID.randomUUID(), "CustomHead");
+            
+            Class<?> propertyClass = Class.forName("com.mojang.authlib.properties.Property");
+            Object property = propertyClass.getConstructor(String.class, String.class)
+                    .newInstance("textures", base64Texture);
+            
+            @SuppressWarnings("unchecked")
+            java.util.Map<String, java.util.Collection<Object>> properties =
+                    (java.util.Map<String, java.util.Collection<Object>>) gameProfileClass.getMethod("getProperties").invoke(gameProfile);
+            properties.put("textures", java.util.Collections.singletonList(property));
+            
+            Class<?> skullMetaClass = meta.getClass();
+            java.lang.reflect.Field profileField = skullMetaClass.getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(meta, gameProfile);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed to apply skull texture via GameProfile: " + e.getClass().getSimpleName());
         }
     }
 
@@ -458,5 +517,13 @@ public class GUIManager {
 
     public boolean isPageInfoSlot(int slot) {
         return pageInfoEnabled && slot == pageInfoSlot;
+    }
+
+    public boolean isPrevPageSlot(int slot) {
+        return slot == prevPageSlot;
+    }
+
+    public boolean isNextPageSlot(int slot) {
+        return slot == nextPageSlot;
     }
 }

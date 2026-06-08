@@ -36,7 +36,7 @@ public class DelWarpCommand implements CommandExecutor {
             return true;
         }
 
-        plugin.getWarpManager().deleteWarp(warpName);
+        plugin.getWarpManager().deleteWarp(warp.getName());
         sender.sendMessage(lang.getMessage(sender, "warp-deleted", "%warp%", warp.getName()));
         return true;
     }

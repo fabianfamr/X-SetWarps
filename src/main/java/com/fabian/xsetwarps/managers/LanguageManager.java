@@ -27,7 +27,7 @@ public class LanguageManager {
     }
 
     public void loadLanguage() {
-        plugin.saveDefaultConfig();
+        // Reload config without triggering migration logic again
         plugin.reloadConfig();
 
         // Get language from config (use lowercase for file names)

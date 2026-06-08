@@ -24,6 +24,7 @@ public class WarpManager {
     private final Map<String, Map<String, Warp>> warpsByFile; // fileName -> (warpName -> Warp)
     private final Map<String, FileConfiguration> configsByFile;
     private final Set<String> registeredPermissions = new HashSet<>();
+    private final Object warpLock = new Object();
     
     public WarpManager(XSetWarps plugin) {
         this.plugin = plugin;
@@ -182,73 +183,79 @@ public class WarpManager {
      * Save a warp to its respective file based on identifier
      */
     public boolean saveWarp(Warp warp) {
-        String identifier = warp.getCategory();
-        
-        // Check max-warps limit (global)
-        int maxWarps = plugin.getConfig().getInt("warps.max-warps", -1);
-        if (maxWarps > 0 && getTotalWarpCount() >= maxWarps) {
-            return false;
-        }
+        synchronized (warpLock) {
+            String identifier = warp.getCategory();
+            
+            // Check max-warps limit (global)
+            int maxWarps = plugin.getConfig().getInt("warps.max-warps", -1);
+            if (maxWarps > 0 && getTotalWarpCount() >= maxWarps) {
+                return false;
+            }
 
-        // Ensure the file exists
-        Map<String, Warp> warpsInFile = warpsByFile.computeIfAbsent(identifier, k -> new HashMap<>());
-        warpsInFile.put(warp.getName().toLowerCase(), warp);
-        
-        // Save to config
-        FileConfiguration config = configsByFile.computeIfAbsent(identifier, k -> {
-            File file = new File(plugin.getDataFolder(), "warps/" + identifier + ".yml");
-            return YamlConfiguration.loadConfiguration(file);
-        });
-        
-        String path = warp.getName();
-        config.set(path + ".world",       warp.getWorldName());
-        config.set(path + ".x",           warp.getX());
-        config.set(path + ".y",           warp.getY());
-        config.set(path + ".z",           warp.getZ());
-        config.set(path + ".yaw",         warp.getYaw());
-        config.set(path + ".pitch",       warp.getPitch());
-        if (warp.getPermission() != null && !warp.getPermission().isEmpty()) {
-            config.set(path + ".permission", warp.getPermission());
-        } else {
-            config.set(path + ".permission", "");
-        }
-        config.set(path + ".description", warp.getDescription());
-        config.set(path + ".created-by",  warp.getCreatedBy());
-        config.set(path + ".created-at",  warp.getCreatedAt());
+            // Ensure the file exists
+            Map<String, Warp> warpsInFile = warpsByFile.computeIfAbsent(identifier, k -> new HashMap<>());
+            warpsInFile.put(warp.getName().toLowerCase(), warp);
+            
+            // Save to config
+            FileConfiguration config = configsByFile.computeIfAbsent(identifier, k -> {
+                File file = new File(plugin.getDataFolder(), "warps/" + identifier + ".yml");
+                return YamlConfiguration.loadConfiguration(file);
+            });
+            
+            String path = warp.getName();
+            config.set(path + ".world",       warp.getWorldName());
+            config.set(path + ".x",           warp.getX());
+            config.set(path + ".y",           warp.getY());
+            config.set(path + ".z",           warp.getZ());
+            config.set(path + ".yaw",         warp.getYaw());
+            config.set(path + ".pitch",       warp.getPitch());
+            config.set(path + ".category",    warp.getCategory());
+            if (warp.getPermission() != null && !warp.getPermission().isEmpty()) {
+                config.set(path + ".permission", warp.getPermission());
+            } else {
+                config.set(path + ".permission", null);
+            }
+            config.set(path + ".description", warp.getDescription());
+            config.set(path + ".created-by",  warp.getCreatedBy());
+            config.set(path + ".created-at",  warp.getCreatedAt());
 
-        try {
-            File file = new File(plugin.getDataFolder(), "warps/" + identifier + ".yml");
-            config.save(file);
-            // Register the permission so LuckPerms can see it immediately
-            registerWarpPermission(warp);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+            try {
+                File file = new File(plugin.getDataFolder(), "warps/" + identifier + ".yml");
+                config.save(file);
+                // Register the permission so LuckPerms can see it immediately
+                registerWarpPermission(warp);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
         }
-        return true;
     }
 
     /**
      * Delete a warp from its file
      */
     public void deleteWarp(String name) {
-        Warp warp = getWarp(name);
-        if (warp == null) return;
-        
-        String identifier = warp.getCategory();
-        Map<String, Warp> warpsInFile = warpsByFile.get(identifier);
-        if (warpsInFile != null) {
-            warpsInFile.remove(name.toLowerCase());
-        }
-        
-        FileConfiguration config = configsByFile.get(identifier);
-        if (config != null) {
-            config.set(warp.getName(), null);
-            try {
-                File file = new File(plugin.getDataFolder(), "warps/" + identifier + ".yml");
-                config.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
+        synchronized (warpLock) {
+            Warp warp = getWarp(name);
+            if (warp == null) return;
+            
+            String identifier = warp.getCategory();
+            Map<String, Warp> warpsInFile = warpsByFile.get(identifier);
+            if (warpsInFile != null) {
+                warpsInFile.remove(name.toLowerCase());
+            }
+            
+            FileConfiguration config = configsByFile.get(identifier);
+            if (config != null) {
+                // Use the original warp name (case-sensitive) to remove from YAML
+                config.set(warp.getName(), null);
+                try {
+                    File file = new File(plugin.getDataFolder(), "warps/" + identifier + ".yml");
+                    config.save(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

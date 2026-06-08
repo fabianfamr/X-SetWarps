@@ -41,11 +41,13 @@ public class SetWarpCommand implements CommandExecutor {
         // Parse arguments: [name] [identifier] [description...]
         // If no identifier provided, use "warps" as default
         if (args.length >= 2) {
-            // Check if second arg is an identifier (file exists) or part of description
+            // Check if second arg is an identifier (file exists or "warps") or part of description
             String potentialIdentifier = args[1].toLowerCase();
             File identifierFile = new File(plugin.getDataFolder(), "warps/" + potentialIdentifier + ".yml");
             
-            if (identifierFile.exists() || args[1].equalsIgnoreCase("warps")) {
+            // Accept "warps" (default) or any existing warp file
+            // Also allow creating new warp files if the identifier looks valid (alphanumeric)
+            if (potentialIdentifier.equals("warps") || identifierFile.exists() || potentialIdentifier.matches("[a-zA-Z0-9_-]+")) {
                 // It's an identifier
                 identifier = potentialIdentifier;
                 // Remaining args are description

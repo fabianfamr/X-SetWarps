@@ -33,6 +33,13 @@ buttons:
     lore:
       - "&7Click to close this menu"
 
+# Navigation Buttons
+navigation:
+  prev-page:
+    slot: 27
+  next-page:
+    slot: 35
+
 # ==============================================================================
 # WARP ITEMS
 # ==============================================================================

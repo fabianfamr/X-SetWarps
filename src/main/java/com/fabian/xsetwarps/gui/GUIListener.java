@@ -8,7 +8,6 @@ import com.fabian.xsetwarps.model.Warp;
 import com.fabian.xsetwarps.utils.SchedulerUtils;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,7 +17,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 @SuppressWarnings("deprecation")
 public class GUIListener implements Listener {
@@ -52,7 +50,7 @@ public class GUIListener implements Listener {
             return;
         }
 
-        if (isNavigationItem(item, "« Previous Page")) {
+        if (guiManager.isPrevPageSlot(slot) && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
             int prevPage = holder.getPage() - 1;
             if (prevPage >= 1) {
                 guiManager.openWarpsListGUI(player, prevPage);
@@ -60,7 +58,7 @@ public class GUIListener implements Listener {
             return;
         }
 
-        if (isNavigationItem(item, "Next Page »")) {
+        if (guiManager.isNextPageSlot(slot) && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
             int nextPage = holder.getPage() + 1;
             guiManager.openWarpsListGUI(player, nextPage);
             return;
@@ -133,15 +131,6 @@ public class GUIListener implements Listener {
 
         Player player = (Player) event.getPlayer();
         guiManager.cleanupPlayer(player);
-    }
-
-    private boolean isNavigationItem(ItemStack item, String text) {
-        if (!item.hasItemMeta()) return false;
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null || !meta.hasDisplayName()) return false;
-        String display = meta.getDisplayName();
-        return ChatColor.stripColor(display).contains(text)
-                || display.contains(text);
     }
 
     private void performDelayedTeleport(Player player, Warp warp, int delaySeconds) {
@@ -218,6 +207,6 @@ public class GUIListener implements Listener {
             plugin.getTeleportEffects().playTeleportOut(player.getLocation());
         }
 
-        player.sendMessage(lang.getMessage("warp-teleport", "%warp%", warp.getName()));
+        player.sendMessage(lang.getMessage(player, "warp-teleport", "%warp%", warp.getName()));
     }
 }
