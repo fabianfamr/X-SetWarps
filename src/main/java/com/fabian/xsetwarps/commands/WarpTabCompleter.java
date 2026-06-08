@@ -26,17 +26,61 @@ public class WarpTabCompleter implements TabCompleter {
         
         // Handle xsetwarp subcommands
         if (command.getName().equalsIgnoreCase("xsetwarp")) {
-            if (!sender.hasPermission("xsetwarps.admin")) {
-                return completions;
-            }
             if (args.length == 1) {
-                List<String> subCommands = Arrays.asList("reload", "update", "version", "locate", "export", "import", "import-essentials", "import-cmi");
+                List<String> subCommands = new ArrayList<>();
+                boolean isAdmin = sender.hasPermission("xsetwarps.admin");
+                boolean canExport = isAdmin || sender.hasPermission("xsetwarps.export");
+                boolean canImport = isAdmin || sender.hasPermission("xsetwarps.import");
+
+                if (isAdmin) {
+                    subCommands.addAll(Arrays.asList("reload", "update", "version", "locate", "setwarpcooldown"));
+                }
+                if (canExport) {
+                    subCommands.add("export");
+                }
+                if (canImport) {
+                    subCommands.add("import");
+                }
                 StringUtil.copyPartialMatches(args[0], subCommands, completions);
                 Collections.sort(completions);
-            } else if (args.length == 2 && args[0].equalsIgnoreCase("locate")) {
-                // Get available languages dynamically (lowercase)
-                List<String> languages = plugin.getLanguageManager().getAvailableLanguages();
-                StringUtil.copyPartialMatches(args[1], languages, completions);
+            } else if (args.length == 2) {
+                if (args[0].equalsIgnoreCase("locate")) {
+                    // Suggest available languages
+                    List<String> languages = plugin.getLanguageManager().getAvailableLanguages();
+                    StringUtil.copyPartialMatches(args[1], languages, completions);
+                    Collections.sort(completions);
+                } else if (args[0].equalsIgnoreCase("import")) {
+                    // Suggest: file names from exports/, plugin names, and "all"
+                    completions.add("essentials");
+                    completions.add("cmi");
+                    completions.add("all");
+                    // Suggest exported file names (without .yml)
+                    java.io.File exportDir = new java.io.File(plugin.getDataFolder(), "exports");
+                    if (exportDir.exists() && exportDir.isDirectory()) {
+                        java.io.File[] files = exportDir.listFiles((dir, name) -> name.endsWith(".yml"));
+                        if (files != null) {
+                            for (java.io.File f : files) {
+                                completions.add(f.getName().replace(".yml", ""));
+                            }
+                        }
+                    }
+                    StringUtil.copyPartialMatches(args[1], completions, completions);
+                    Collections.sort(completions);
+                } else if (args[0].equalsIgnoreCase("setwarpcooldown")) {
+                    // Suggest warp names
+                    for (Warp warp : plugin.getWarpManager().getAllWarps()) {
+                        completions.add(warp.getName());
+                    }
+                    StringUtil.copyPartialMatches(args[1], completions, completions);
+                    Collections.sort(completions);
+                }
+            } else if (args.length == 3 && args[0].equalsIgnoreCase("setwarpcooldown")) {
+                StringUtil.copyPartialMatches(args[2], Arrays.asList("default", "0", "5", "10", "30", "60"), completions);
+                Collections.sort(completions);
+            } else if (args.length == 3 && args[0].equalsIgnoreCase("export")) {
+                // Suggest identifiers (file names from warps/)
+                completions.addAll(plugin.getWarpManager().getIdentifiers());
+                StringUtil.copyPartialMatches(args[2], completions, completions);
                 Collections.sort(completions);
             }
             return completions;

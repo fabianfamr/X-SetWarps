@@ -170,9 +170,11 @@ public class WarpManager {
             String createdBy  = section.getString("created-by", "unknown");
             long createdAt    = section.getLong("created-at", System.currentTimeMillis());
             String permission = section.getString("permission", "");
+            int cooldown = section.getInt("cooldown", -1); // -1 = use global default
 
             Warp warp = new Warp(key, worldName, x, y, z, yaw, pitch, description, createdBy, createdAt, identifier);
             warp.setPermission(permission);
+            warp.setCooldown(cooldown);
             warpsInFile.put(key.toLowerCase(), warp);
         }
         
@@ -214,6 +216,11 @@ public class WarpManager {
                 config.set(path + ".permission", warp.getPermission());
             } else {
                 config.set(path + ".permission", null);
+            }
+            if (warp.getCooldown() >= 0) {
+                config.set(path + ".cooldown", warp.getCooldown());
+            } else {
+                config.set(path + ".cooldown", null); // Don't write if using default
             }
             config.set(path + ".description", warp.getDescription());
             config.set(path + ".created-by",  warp.getCreatedBy());
@@ -366,6 +373,9 @@ public class WarpManager {
             if (warp.getPermission() != null && !warp.getPermission().isEmpty()) {
                 export.set(path + ".permission", warp.getPermission());
             }
+            if (warp.getCooldown() >= 0) {
+                export.set(path + ".cooldown", warp.getCooldown());
+            }
         }
 
         File exportDir = new File(plugin.getDataFolder(), "exports");
@@ -417,9 +427,11 @@ public class WarpManager {
             long createdAt = section.getLong("created-at", System.currentTimeMillis());
             String category = section.getString("category", Warp.DEFAULT_IDENTIFIER);
             String permission = section.getString("permission", "");
+            int cooldown = section.getInt("cooldown", -1);
 
             Warp warp = new Warp(key, worldName, x, y, z, yaw, pitch, description, createdBy, createdAt, category);
             warp.setPermission(permission);
+            warp.setCooldown(cooldown);
 
             if (!warpExists(key)) {
                 saveWarp(warp);
@@ -475,6 +487,91 @@ public class WarpManager {
         }
 
         return count;
+    }
+
+    /**
+     * Import warps from a generic plugin warp file.
+     * Supports multiple formats: Essentials (colon-separated), CMI (section-based),
+     * and standard X-SetWarps export format.
+     * Returns the number of imported warps, or -1 if file not found, -2 if plugin not installed.
+     */
+    public int importPluginWarps(String pluginName, String filePath) {
+        if (Bukkit.getPluginManager().getPlugin(pluginName) == null) return -2;
+
+        File file = new File(filePath);
+        if (!file.exists()) return -1;
+
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+        int count = 0;
+
+        for (String key : config.getKeys(false)) {
+            ConfigurationSection section = config.getConfigurationSection(key);
+            String worldName;
+            double x, y, z;
+            float yaw = 0, pitch = 0;
+
+            try {
+                if (section != null && section.contains("X", true)) {
+                    // Section-based format (CMI-style)
+                    worldName = section.getString("World", section.getString("world", "world"));
+                    x = section.getDouble("X", section.getDouble("x", 0));
+                    y = section.getDouble("Y", section.getDouble("y", 0));
+                    z = section.getDouble("Z", section.getDouble("z", 0));
+                    yaw = (float) section.getDouble("Yaw", section.getDouble("yaw", 0));
+                    pitch = (float) section.getDouble("Pitch", section.getDouble("pitch", 0));
+                } else {
+                    // Colon-separated string format (Essentials-style)
+                    String locStr = config.getString(key);
+                    if (locStr == null || locStr.isEmpty()) continue;
+                    String[] parts = locStr.split(":");
+                    if (parts.length < 4) continue;
+                    worldName = parts[0];
+                    x = Double.parseDouble(parts[1]);
+                    y = Double.parseDouble(parts[2]);
+                    z = Double.parseDouble(parts[3]);
+                    yaw = parts.length > 4 ? Float.parseFloat(parts[4]) : 0;
+                    pitch = parts.length > 5 ? Float.parseFloat(parts[5]) : 0;
+                }
+
+                if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(worldName))) {
+                    worldName = Bukkit.getWorlds().get(0).getName();
+                }
+
+                Warp warp = new Warp(key, worldName, x, y, z, yaw, pitch, "", pluginName,
+                        System.currentTimeMillis(), Warp.DEFAULT_IDENTIFIER);
+
+                if (!warpExists(key)) {
+                    saveWarp(warp);
+                    count++;
+                }
+            } catch (NumberFormatException e) {
+                plugin.getLogger().warning("Skipping malformed warp entry: " + key);
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Auto-detect and import warps from all known installed warp plugins.
+     * Returns a map of plugin name -> number of warps imported.
+     */
+    public Map<String, Integer> importFromAllPlugins() {
+        Map<String, Integer> results = new LinkedHashMap<>();
+
+        // Essentials
+        if (Bukkit.getPluginManager().getPlugin("Essentials") != null) {
+            int count = importEssentialsWarps();
+            results.put("Essentials", count);
+        }
+
+        // CMI
+        if (Bukkit.getPluginManager().getPlugin("CMI") != null) {
+            int count = importCMIWarps();
+            results.put("CMI", count);
+        }
+
+        return results;
     }
 
     /**

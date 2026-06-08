@@ -6,10 +6,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class MainCommand implements CommandExecutor {
     private final XSetWarps plugin;
+
+    // Supported plugin names for /xsetwarp import <plugin>
+    private static final List<String> IMPORTABLE_PLUGINS = Arrays.asList("essentials", "cmi", "all");
 
     public MainCommand(XSetWarps plugin) {
         this.plugin = plugin;
@@ -19,17 +24,42 @@ public class MainCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         LanguageManager lang = plugin.getLanguageManager();
 
-        if (!sender.hasPermission("xsetwarps.admin")) {
-            sender.sendMessage(lang.getMessage("no-permission"));
-            return true;
-        }
-
         if (args.length == 0) {
+            if (!sender.hasPermission("xsetwarps.admin")) {
+                sender.sendMessage(lang.getMessage("no-permission"));
+                return true;
+            }
             sendHelp(sender);
             return true;
         }
 
         String subCommand = args[0].toLowerCase();
+
+        // export and import have their own dedicated permissions (admin OR specific perm)
+        switch (subCommand) {
+            case "export":
+                if (!sender.hasPermission("xsetwarps.admin") && !sender.hasPermission("xsetwarps.export")) {
+                    sender.sendMessage(lang.getMessage("no-permission"));
+                    return true;
+                }
+                handleExportCommand(sender, args);
+                return true;
+            case "import":
+                if (!sender.hasPermission("xsetwarps.admin") && !sender.hasPermission("xsetwarps.import")) {
+                    sender.sendMessage(lang.getMessage("no-permission"));
+                    return true;
+                }
+                handleImportCommand(sender, args);
+                return true;
+            default:
+                break;
+        }
+
+        // All other subcommands require xsetwarps.admin
+        if (!sender.hasPermission("xsetwarps.admin")) {
+            sender.sendMessage(lang.getMessage("no-permission"));
+            return true;
+        }
 
         switch (subCommand) {
             case "reload":
@@ -49,17 +79,8 @@ public class MainCommand implements CommandExecutor {
             case "locate":
                 handleLocateCommand(sender, args);
                 break;
-            case "export":
-                handleExportCommand(sender, args);
-                break;
-            case "import":
-                handleImportCommand(sender, args);
-                break;
-            case "import-essentials":
-                handleImportEssentialsCommand(sender);
-                break;
-            case "import-cmi":
-                handleImportCMICommand(sender);
+            case "setwarpcooldown":
+                handleSetWarpCooldown(sender, args);
                 break;
             default:
                 sendHelp(sender);
@@ -73,7 +94,6 @@ public class MainCommand implements CommandExecutor {
         LanguageManager lang = plugin.getLanguageManager();
 
         if (args.length < 2) {
-            // Show current language and list available
             String current = plugin.getLanguageManager().getCurrentLanguage().toLowerCase();
             List<String> available = plugin.getLanguageManager().getAvailableLanguages();
             sender.sendMessage(lang.getMessage("language-changed", "%language%", current));
@@ -102,7 +122,7 @@ public class MainCommand implements CommandExecutor {
         sender.sendMessage(lang.getMessage("help-locate"));
         sender.sendMessage(lang.getMessage("help-export"));
         sender.sendMessage(lang.getMessage("help-import"));
-        sender.sendMessage(lang.getMessage("help-import-plugins"));
+        sender.sendMessage(lang.getMessage("help-setwarpcooldown"));
         sender.sendMessage(lang.getMessage("help-setwarp"));
         sender.sendMessage(lang.getMessage("help-warp"));
         sender.sendMessage(lang.getMessage("help-delwarp"));
@@ -129,6 +149,14 @@ public class MainCommand implements CommandExecutor {
         }
     }
 
+    /**
+     * Unified import command: /xsetwarp import <file|essentials|cmi|all>
+     *
+     * - If arg is "essentials" -> import from Essentials plugin
+     * - If arg is "cmi"       -> import from CMI plugin
+     * - If arg is "all"       -> import from all detected plugins
+     * - Otherwise             -> import from a YAML file in exports/ or warps/
+     */
     private void handleImportCommand(CommandSender sender, String[] args) {
         LanguageManager lang = plugin.getLanguageManager();
 
@@ -137,41 +165,131 @@ public class MainCommand implements CommandExecutor {
             return;
         }
 
-        String fileName = args[1];
-        int count = plugin.getWarpManager().importWarps(fileName);
-        if (count >= 0) {
-            sender.sendMessage(lang.getMessage(sender, "import-success", "%count%", String.valueOf(count)));
-            plugin.getWarpManager().loadAllWarps();
-        } else if (count == -1) {
-            sender.sendMessage(lang.getMessage(sender, "import-file-not-found", "%file%", fileName));
+        String target = args[1].toLowerCase();
+
+        // Import from a specific plugin
+        switch (target) {
+            case "essentials":
+                handleImportPlugin(sender, "Essentials", "essentials");
+                return;
+            case "cmi":
+                handleImportPlugin(sender, "CMI", "cmi");
+                return;
+            case "all":
+                handleImportAll(sender);
+                return;
+            default:
+                // Import from a YAML file (exports/ or warps/)
+                int count = plugin.getWarpManager().importWarps(target);
+                if (count >= 0) {
+                    sender.sendMessage(lang.getMessage(sender, "import-success", "%count%", String.valueOf(count)));
+                    plugin.getWarpManager().loadAllWarps();
+                } else if (count == -1) {
+                    sender.sendMessage(lang.getMessage(sender, "import-file-not-found", "%file%", target));
+                }
+                break;
         }
     }
 
-    private void handleImportEssentialsCommand(CommandSender sender) {
+    /**
+     * Import warps from a specific plugin by name.
+     */
+    private void handleImportPlugin(CommandSender sender, String displayName, String pluginName) {
         LanguageManager lang = plugin.getLanguageManager();
 
-        int count = plugin.getWarpManager().importEssentialsWarps();
+        int count;
+        if (pluginName.equals("essentials")) {
+            count = plugin.getWarpManager().importEssentialsWarps();
+        } else if (pluginName.equals("cmi")) {
+            count = plugin.getWarpManager().importCMIWarps();
+        } else {
+            count = -2;
+        }
+
         if (count >= 0) {
-            sender.sendMessage(lang.getMessage(sender, "import-success", "%count%", String.valueOf(count)));
+            sender.sendMessage(lang.getMessage(sender, "import-plugin-success",
+                    "%plugin%", displayName, "%count%", String.valueOf(count)));
             plugin.getWarpManager().loadAllWarps();
         } else if (count == -2) {
-            sender.sendMessage(lang.getMessage(sender, "import-essentials-not-found"));
+            sender.sendMessage(lang.getMessage(sender, "import-plugin-not-found", "%plugin%", displayName));
         } else {
-            sender.sendMessage(lang.getMessage(sender, "import-file-not-found", "%file%", "Essentials/warps.yml"));
+            sender.sendMessage(lang.getMessage(sender, "import-file-not-found",
+                    "%file%", displayName + "/warps.yml"));
         }
     }
 
-    private void handleImportCMICommand(CommandSender sender) {
+    /**
+     * Import warps from all detected compatible plugins.
+     */
+    private void handleImportAll(CommandSender sender) {
         LanguageManager lang = plugin.getLanguageManager();
 
-        int count = plugin.getWarpManager().importCMIWarps();
-        if (count >= 0) {
-            sender.sendMessage(lang.getMessage(sender, "import-success", "%count%", String.valueOf(count)));
+        Map<String, Integer> results = plugin.getWarpManager().importFromAllPlugins();
+        if (results.isEmpty()) {
+            sender.sendMessage(lang.getMessage(sender, "import-all-no-plugins"));
+            return;
+        }
+
+        int total = 0;
+        for (Map.Entry<String, Integer> entry : results.entrySet()) {
+            int count = entry.getValue();
+            if (count >= 0) {
+                sender.sendMessage(lang.getMessage(sender, "import-all-result",
+                        "%plugin%", entry.getKey(), "%count%", String.valueOf(count)));
+                total += count;
+            } else if (count == -1) {
+                sender.sendMessage(lang.getMessage(sender, "import-file-not-found",
+                        "%file%", entry.getKey() + "/warps.yml"));
+            }
+        }
+
+        if (total > 0) {
             plugin.getWarpManager().loadAllWarps();
-        } else if (count == -2) {
-            sender.sendMessage(lang.getMessage(sender, "import-cmi-not-found"));
+            sender.sendMessage(lang.getMessage(sender, "import-success", "%count%", String.valueOf(total)));
+        }
+    }
+
+    private void handleSetWarpCooldown(CommandSender sender, String[] args) {
+        LanguageManager lang = plugin.getLanguageManager();
+
+        if (args.length < 3) {
+            sender.sendMessage(lang.getMessage(sender, "usage-setwarpcooldown"));
+            return;
+        }
+
+        String warpName = args[1];
+        String cooldownStr = args[2];
+        int cooldown;
+
+        if (cooldownStr.equalsIgnoreCase("default") || cooldownStr.equalsIgnoreCase("-1")) {
+            cooldown = -1; // Use global default
         } else {
-            sender.sendMessage(lang.getMessage(sender, "import-file-not-found", "%file%", "CMI/warps.yml"));
+            try {
+                cooldown = Integer.parseInt(cooldownStr);
+                if (cooldown < -1) {
+                    sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-invalid"));
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-invalid"));
+                return;
+            }
+        }
+
+        com.fabian.xsetwarps.model.Warp warp = plugin.getWarpManager().getWarp(warpName);
+        if (warp == null) {
+            sender.sendMessage(lang.getMessage(sender, "warp-not-found", "%warp%", warpName));
+            return;
+        }
+
+        warp.setCooldown(cooldown);
+        // Re-save the warp to persist the change
+        plugin.getWarpManager().saveWarp(warp);
+
+        if (cooldown == -1) {
+            sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-reset", "%warp%", warp.getName()));
+        } else {
+            sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-set", "%warp%", warp.getName(), "%seconds%", String.valueOf(cooldown)));
         }
     }
 }

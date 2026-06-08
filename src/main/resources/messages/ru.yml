@@ -66,3 +66,27 @@ help-warp: "&b/warp <имя> &f- Телепорт на варп"
 help-delwarp: "&b/delwarp <имя> &f- Удалить варп"
 help-warps: "&b/warps &f- Открыть меню варпов"
 help-warpinfo: "&b/warpinfo <имя> &f- Инфо о варпе"
+
+# Export/Import
+usage-export: "%prefix%&cИспользование: /xsetwarp export <файл> [идентификатор]"
+usage-import: "%prefix%&cИспользование: /xsetwarp import <file|essentials|cmi|all>"
+export-success: "%prefix%&aЭкспортировано &e%count% &aварпов в &b%file%"
+export-failed: "%prefix%&cОшибка экспорта варпов."
+import-success: "%prefix%&aИмпортировано &e%count% &aварпов!"
+import-file-not-found: "%prefix%&cФайл не найден: &b%file%"
+import-plugin-not-found: "%prefix%&cПлагин %plugin% не установлен."
+import-plugin-success: "%prefix%&aИмпортировано &e%count% &aварпов из %plugin%."
+
+warp-global-cooldown: "%prefix%&cПодождите &e%seconds%с. &cперед использованием любого варпа."
+
+usage-setwarpcooldown: "%prefix%&cИспользование: /xsetwarp setwarpcooldown <варп> <секунды|default>"
+setwarpcooldown-set: "%prefix%&aКулдаун варпа '&b%warp%&a' установлен на &e%seconds%с."
+setwarpcooldown-reset: "%prefix%&aКулдаун варпа '&b%warp%&a' сброшен на глобальное значение."
+setwarpcooldown-invalid: "%prefix%&cНеверное значение. Используйте число >= 0 или 'default'."
+
+help-export: "&b/xsw export <file> [id] &f- Экспорт варпов"
+help-import: "&b/xsw import <file|essentials|cmi|all> &f- Импорт варпов"
+help-setwarpcooldown: "&b/xsw setwarpcooldown <warp> <s> &f- Кулдаун варпа"
+
+import-all-no-plugins: "%prefix%&cСовместимые плагины варпов не найдены."
+import-all-result: "%prefix%&aИз %plugin%: импортировано &e%count% &aварпов."
