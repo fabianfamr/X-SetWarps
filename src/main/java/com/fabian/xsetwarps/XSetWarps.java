@@ -89,10 +89,6 @@ public class XSetWarps extends JavaPlugin {
                 .sendMessage(ColorUtils.translateColors("&8[&bX-SetWarps&8] &7Connecting to YAML database..."));
         getServer().getConsoleSender()
                 .sendMessage(ColorUtils.translateColors("&8[&bX-SetWarps&8] &7YAML database connected and ready."));
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            getServer().getConsoleSender().sendMessage(ColorUtils.translateColors(
-                    "&b[PlaceholderAPI] &fSuccessfully registered internal expansion: xsetwarps [" + version + "]"));
-        }
 
         getServer().getConsoleSender().sendMessage(
                 ColorUtils.translateColors("&8[&bX-SetWarps&8] &7----------------------------------------------"));
