@@ -54,3 +54,39 @@ help-warp: "&b/warp <名前> &f- ワープにテレポート"
 help-delwarp: "&b/delwarp <名前> &f- ワープを削除"
 help-warps: "&b/warps &f- ワープリストを表示"
 help-warpinfo: "&b/warpinfo <名前> &f- 詳細情報を表示"
+
+# 言語メッセージ
+language-changed: "%prefix%&a言語を &b%language% &aに変更しました。"
+language-not-found: "%prefix%&c言語が見つかりません。選択: %list%"
+language-list: "&a利用可能: &f%list%"
+
+# Locateコマンド
+help-locate: "&b/xsw locate <言語> &f- 言語を変更"
+
+# エクスポート/インポートメッセージ
+usage-export: "%prefix%&c使用法: /xsetwarp export <ファイル> [識別子]"
+usage-import: "%prefix%&c使用法: /xsetwarp import <file|essentials|cmi|all>"
+export-success: "%prefix%&a&e%count% &aワープを &b%file% &aにエクスポートしました。"
+export-failed: "%prefix%&cワープのエクスポートに失敗しました。"
+import-success: "%prefix%&a&e%count% &aワープをインポートしました！"
+import-file-not-found: "%prefix%&cファイルが見つかりません: &b%file%"
+import-plugin-not-found: "%prefix%&c%plugin% プラグインがインストールされていません。"
+import-plugin-success: "%prefix%&a%plugin% から &e%count% &aワープをインポートしました。"
+
+# グローバルクールダウン
+warp-global-cooldown: "%prefix%&c&e%seconds%秒 &c待ってからワープを使用してください。"
+
+# ワープ毎のクールダウン（管理者コマンド）
+usage-setwarpcooldown: "%prefix%&c使用法: /xsetwarp setwarpcooldown <ワープ> <秒数|default>"
+setwarpcooldown-set: "%prefix%&aワープ '&b%warp%&a' のクールダウンを &e%seconds%秒 &aに設定しました。"
+setwarpcooldown-reset: "%prefix%&aワープ '&b%warp%&a' のクールダウンをデフォルトに戻しました。"
+setwarpcooldown-invalid: "%prefix%&c無効な値です。0以上の数字または 'default' を使用してください。"
+
+# ヘルプ追加
+help-export: "&b/xsw export <file> [id] &f- ワープをエクスポート"
+help-import: "&b/xsw import <file|essentials|cmi|all> &f- ワープをインポート"
+help-setwarpcooldown: "&b/xsw setwarpcooldown <warp> <s> &f- ワープ毎のクールダウン"
+
+# 全てインポート
+import-all-no-plugins: "%prefix%&c対応するワーププラグインが見つかりません。"
+import-all-result: "%prefix%&a%plugin% から: &e%count% &aワープをインポートしました。"

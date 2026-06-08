@@ -54,3 +54,39 @@ help-warp: "&b/warp <name> &f- Teleport to a warp"
 help-delwarp: "&b/delwarp <name> &f- Delete a warp"
 help-warps: "&b/warps &f- List all warps"
 help-warpinfo: "&b/warpinfo <name> &f- Detailed info about a warp"
+
+# Language Messages
+language-changed: "%prefix%&aLanguage changed to: &b%language%"
+language-not-found: "%prefix%&cLanguage not found. Available: %list%"
+language-list: "&aAvailable: &f%list%"
+
+# Locate Command
+help-locate: "&b/xsw locate <lang> &f- Change language"
+
+# Export/Import Messages
+usage-export: "%prefix%&cUsage: /xsetwarp export <filename> [identifier]"
+usage-import: "%prefix%&cUsage: /xsetwarp import <filename|essentials|cmi|all>"
+export-success: "%prefix%&aExported &e%count% &awarps to &b%file%"
+export-failed: "%prefix%&cFailed to export warps."
+import-success: "%prefix%&aImported &e%count% &awarps successfully!"
+import-file-not-found: "%prefix%&cFile not found: &b%file%"
+import-plugin-not-found: "%prefix%&c%plugin% plugin is not installed."
+import-plugin-success: "%prefix%&aImported &e%count% &awarps from %plugin%."
+
+# Global Cooldown
+warp-global-cooldown: "%prefix%&cYou must wait &e%seconds%s &cbefore using any warp."
+
+# Per-Warp Cooldown (admin command)
+usage-setwarpcooldown: "%prefix%&cUsage: /xsetwarp setwarpcooldown <warp> <seconds|default>"
+setwarpcooldown-set: "%prefix%&aWarp '&b%warp%&a' cooldown set to &e%seconds%s."
+setwarpcooldown-reset: "%prefix%&aWarp '&b%warp%&a' cooldown reset to global default."
+setwarpcooldown-invalid: "%prefix%&cInvalid cooldown value. Use a number >= 0 or 'default'."
+
+# Help additions
+help-export: "&b/xsw export <file> [id] &f- Export warps to file"
+help-import: "&b/xsw import <file|essentials|cmi|all> &f- Import warps"
+help-setwarpcooldown: "&b/xsw setwarpcooldown <warp> <s> &f- Set per-warp cooldown"
+
+# Import All
+import-all-no-plugins: "%prefix%&cNo supported warp plugins found on the server."
+import-all-result: "%prefix%&aFrom %plugin%: imported &e%count% &awarps."

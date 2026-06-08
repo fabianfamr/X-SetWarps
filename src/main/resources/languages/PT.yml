@@ -54,3 +54,39 @@ help-warp: "&b/warp <nome> &f- Teletransportar para um warp"
 help-delwarp: "&b/delwarp <nome> &f- Eliminar um warp"
 help-warps: "&b/warps &f- Listar warps"
 help-warpinfo: "&b/warpinfo <nome> &f- Informação detalhada"
+
+# Mensagens de Idioma
+language-changed: "%prefix%&aIdioma alterado para: &b%language%"
+language-not-found: "%prefix%&cIdioma não encontrado. Disponíveis: %list%"
+language-list: "&aDisponíveis: &f%list%"
+
+# Comando Locate
+help-locate: "&b/xsw locate <idioma> &f- Alterar idioma"
+
+# Mensagens de Exportar/Importar
+usage-export: "%prefix%&cUso: /xsetwarp export <arquivo> [identificador]"
+usage-import: "%prefix%&cUso: /xsetwarp import <arquivo|essentials|cmi|all>"
+export-success: "%prefix%&aExportados &e%count% &awarps para &b%file%"
+export-failed: "%prefix%&cFalha ao exportar warps."
+import-success: "%prefix%&aImportados &e%count% &awarps com sucesso!"
+import-file-not-found: "%prefix%&cArquivo não encontrado: &b%file%"
+import-plugin-not-found: "%prefix%&cO plugin %plugin% não está instalado."
+import-plugin-success: "%prefix%&aImportados &e%count% &awarps de %plugin%."
+
+# Cooldown Global
+warp-global-cooldown: "%prefix%&cVocê deve esperar &e%seconds%s &cantes de usar qualquer warp."
+
+# Cooldown por Warp (comando admin)
+usage-setwarpcooldown: "%prefix%&cUso: /xsetwarp setwarpcooldown <warp> <segundos|default>"
+setwarpcooldown-set: "%prefix%&aCooldown do warp '&b%warp%&a' definido para &e%seconds%s."
+setwarpcooldown-reset: "%prefix%&aCooldown do warp '&b%warp%&a' restaurado ao valor global."
+setwarpcooldown-invalid: "%prefix%&cValor de cooldown inválido. Use um número >= 0 ou 'default'."
+
+# Ajuda adicional
+help-export: "&b/xsw export <arquivo> [id] &f- Exportar warps"
+help-import: "&b/xsw import <arquivo|essentials|cmi|all> &f- Importar warps"
+help-setwarpcooldown: "&b/xsw setwarpcooldown <warp> <s> &f- Cooldown por warp"
+
+# Importar Tudo
+import-all-no-plugins: "%prefix%&cNenhum plugin de warps compatível encontrado."
+import-all-result: "%prefix%&aDe %plugin%: importados &e%count% &awarps."

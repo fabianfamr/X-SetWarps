@@ -54,3 +54,39 @@ help-warp: "&b/warp <имя> &f- Телепортироваться на вар�
 help-delwarp: "&b/delwarp <имя> &f- Удалить варп"
 help-warps: "&b/warps &f- Список варпов"
 help-warpinfo: "&b/warpinfo <имя> &f- Подробная информация"
+
+# Сообщения языка
+language-changed: "%prefix%&aЯзык изменен на: &b%language%"
+language-not-found: "%prefix%&cЯзык не найден. Доступные: %list%"
+language-list: "&aДоступные: &f%list%"
+
+# Команда Locate
+help-locate: "&b/xsw locate <язык> &f- Сменить язык"
+
+# Экспорт/Импорт
+usage-export: "%prefix%&cИспользование: /xsetwarp export <файл> [идентификатор]"
+usage-import: "%prefix%&cИспользование: /xsetwarp import <файл|essentials|cmi|all>"
+export-success: "%prefix%&aЭкспортировано &e%count% &aварпов в &b%file%"
+export-failed: "%prefix%&cОшибка экспорта варпов."
+import-success: "%prefix%&aИмпортировано &e%count% &aварпов!"
+import-file-not-found: "%prefix%&cФайл не найден: &b%file%"
+import-plugin-not-found: "%prefix%&cПлагин %plugin% не установлен."
+import-plugin-success: "%prefix%&aИмпортировано &e%count% &aварпов из %plugin%."
+
+# Глобальный кулдаун
+warp-global-cooldown: "%prefix%&cПодождите &e%seconds%с. &cперед использованием любого варпа."
+
+# Кулдаун варпа (команда админа)
+usage-setwarpcooldown: "%prefix%&cИспользование: /xsetwarp setwarpcooldown <варп> <секунды|default>"
+setwarpcooldown-set: "%prefix%&aКулдаун варпа '&b%warp%&a' установлен на &e%seconds%с."
+setwarpcooldown-reset: "%prefix%&aКулдаун варпа '&b%warp%&a' сброшен на глобальное значение."
+setwarpcooldown-invalid: "%prefix%&cНеверное значение. Используйте число >= 0 или 'default'."
+
+# Дополнительная помощь
+help-export: "&b/xsw export <file> [id] &f- Экспорт варпов"
+help-import: "&b/xsw import <file|essentials|cmi|all> &f- Импорт варпов"
+help-setwarpcooldown: "&b/xsw setwarpcooldown <warp> <s> &f- Кулдаун варпа"
+
+# Импорт всех
+import-all-no-plugins: "%prefix%&cСовместимые плагины варпов не найдены."
+import-all-result: "%prefix%&aИз %plugin%: импортировано &e%count% &aварпов."
