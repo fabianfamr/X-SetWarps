@@ -95,7 +95,7 @@ public class XSetWarps extends JavaPlugin {
         }
 
         getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8] &3----------------------------------------------"));
+                ColorUtils.translateColors("&8[&bX-SetWarps&8] &7----------------------------------------------"));
         getServer().getConsoleSender().sendMessage(
                 ColorUtils.translateColors("&8[&bX-SetWarps&8]   &aEnabled v" + version + "! Enjoy warping!"));
         getServer().getConsoleSender().sendMessage(
@@ -103,7 +103,7 @@ public class XSetWarps extends JavaPlugin {
         getServer().getConsoleSender()
                 .sendMessage(ColorUtils.translateColors("&8[&bX-SetWarps&8]   &fPlaceholderAPI: " + papiStatus));
         getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8] &3----------------------------------------------"));
+                ColorUtils.translateColors("&8[&bX-SetWarps&8] &7----------------------------------------------"));
 
         if (getConfig().getBoolean("updates.check", true)) {
             updateChecker.checkForUpdates();
@@ -129,11 +129,11 @@ public class XSetWarps extends JavaPlugin {
         String version = getDescription().getVersion();
 
         getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8] &3----------------------------------------------"));
+                ColorUtils.translateColors("&8[&bX-SetWarps&8] &7----------------------------------------------"));
         getServer().getConsoleSender().sendMessage(
                 ColorUtils.translateColors("&8[&bX-SetWarps&8]   &cDisabled v" + version + "! Goodbye."));
         getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8] &3----------------------------------------------"));
+                ColorUtils.translateColors("&8[&bX-SetWarps&8] &7----------------------------------------------"));
     }
 
     public WarpManager getWarpManager() {
