@@ -428,10 +428,18 @@ public class GUIManager {
     private void applySkullTexture(SkullMeta meta, String base64Texture) {
         if (base64Texture == null || base64Texture.isEmpty()) return;
 
-        // Use reflection-only approach for cross-version compatibility
-        // (org.bukkit.profile.PlayerProfile does not exist in 1.16.5 API)
+        // Strategy 1: Paper API (PlayerProfile) — Paper 1.14+
+        if (setSkullViaPaperProfile(meta, base64Texture)) return;
+
+        // Strategy 2: Direct GameProfile field manipulation — Spigot 1.8.8+
+        setSkullViaGameProfile(meta, base64Texture);
+    }
+
+    /**
+     * Try Paper's PlayerProfile API via pure reflection (no compile dependency).
+     */
+    private boolean setSkullViaPaperProfile(SkullMeta meta, String base64Texture) {
         try {
-            // Try Paper API (PlayerProfile) - available on Paper 1.14+
             Object profile = Bukkit.class.getMethod("createProfile", UUID.class, String.class)
                     .invoke(null, UUID.randomUUID(), "CustomHead");
             Class<?> profileClass = profile.getClass();
@@ -439,11 +447,10 @@ public class GUIManager {
             Object property = propertyClass.getConstructor(String.class, String.class)
                     .newInstance("textures", base64Texture);
             profileClass.getMethod("setProperty", propertyClass).invoke(profile, property);
-            // Use reflection to call setPlayerProfile to avoid compile-time dependency
             meta.getClass().getMethod("setPlayerProfile", profileClass).invoke(meta, profile);
-        } catch (Exception e) {
-            // Fallback: try GameProfile via reflection (works on all versions)
-            setSkullViaGameProfile(meta, base64Texture);
+            return true;
+        } catch (Exception ignored) {
+            return false;
         }
     }
 
@@ -459,28 +466,65 @@ public class GUIManager {
         }
     }
 
+    /**
+     * Apply a base64 skull texture by directly setting the GameProfile field on CraftMetaSkull.
+     * Uses constructor scanning to handle different authlib Property signatures across versions.
+     */
     private void setSkullViaGameProfile(SkullMeta meta, String base64Texture) {
         try {
-            // Reflection-based GameProfile approach for maximum compatibility
             Class<?> gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
             Object gameProfile = gameProfileClass.getConstructor(UUID.class, String.class)
                     .newInstance(UUID.randomUUID(), "CustomHead");
-            
+
+            // Create Property — scan constructors for (String,String) or (String,String,String)
             Class<?> propertyClass = Class.forName("com.mojang.authlib.properties.Property");
-            Object property = propertyClass.getConstructor(String.class, String.class)
-                    .newInstance("textures", base64Texture);
-            
-            @SuppressWarnings("unchecked")
-            java.util.Map<String, java.util.Collection<Object>> properties =
-                    (java.util.Map<String, java.util.Collection<Object>>) gameProfileClass.getMethod("getProperties").invoke(gameProfile);
-            properties.put("textures", java.util.Collections.singletonList(property));
-            
-            Class<?> skullMetaClass = meta.getClass();
-            java.lang.reflect.Field profileField = skullMetaClass.getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(meta, gameProfile);
+            Object property = null;
+            for (java.lang.reflect.Constructor<?> ctor : propertyClass.getDeclaredConstructors()) {
+                Class<?>[] pt = ctor.getParameterTypes();
+                if (pt.length == 2 && pt[0] == String.class && pt[1] == String.class) {
+                    ctor.setAccessible(true);
+                    property = ctor.newInstance("textures", base64Texture);
+                    break;
+                } else if (pt.length == 3 && pt[0] == String.class && pt[1] == String.class && pt[2] == String.class) {
+                    ctor.setAccessible(true);
+                    property = ctor.newInstance("textures", base64Texture, "");
+                    break;
+                }
+            }
+            if (property == null) return;
+
+            // Add property to GameProfile's property map
+            Object properties = gameProfileClass.getMethod("getProperties").invoke(gameProfile);
+            // PropertyMap (extends Multimap) — use put(K, V)
+            boolean added = false;
+            try {
+                properties.getClass().getMethod("put", Object.class, Object.class)
+                        .invoke(properties, "textures", property);
+                added = true;
+            } catch (NoSuchMethodException ignored) {
+            }
+            if (!added) {
+                // Fallback: treat as Map and put a singleton list
+                ((java.util.Map<Object, Object>) properties).put("textures",
+                        java.util.Collections.singletonList(property));
+            }
+
+            // Set the GameProfile onto the SkullMeta's internal field
+            java.lang.reflect.Field profileField = null;
+            Class<?> clazz = meta.getClass();
+            while (clazz != null && profileField == null) {
+                try {
+                    profileField = clazz.getDeclaredField("profile");
+                } catch (NoSuchFieldException e) {
+                    clazz = clazz.getSuperclass();
+                }
+            }
+            if (profileField != null) {
+                profileField.setAccessible(true);
+                profileField.set(meta, gameProfile);
+            }
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to apply skull texture via GameProfile: " + e.getClass().getSimpleName());
+            // Custom textures are non-critical — fail silently to avoid console spam
         }
     }
 
