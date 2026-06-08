@@ -30,7 +30,7 @@ public class WarpTabCompleter implements TabCompleter {
                 return completions;
             }
             if (args.length == 1) {
-                List<String> subCommands = Arrays.asList("reload", "update", "version", "locate");
+                List<String> subCommands = Arrays.asList("reload", "update", "version", "locate", "export", "import", "import-essentials", "import-cmi");
                 StringUtil.copyPartialMatches(args[0], subCommands, completions);
                 Collections.sort(completions);
             } else if (args.length == 2 && args[0].equalsIgnoreCase("locate")) {

@@ -107,6 +107,15 @@ public class GUIListener implements Listener {
             return;
         }
 
+        // Global cooldown check
+        int globalCooldownSeconds = plugin.getConfig().getInt("teleport.global-cooldown", 0);
+        if (cooldownManager.isOnGlobalCooldown(player.getUniqueId(), globalCooldownSeconds)) {
+            long remaining = cooldownManager.getGlobalRemainingSeconds(player.getUniqueId(), globalCooldownSeconds);
+            player.sendMessage(lang.getMessage(player, "warp-global-cooldown", "%seconds%",
+                    String.valueOf(remaining)));
+            return;
+        }
+
         SchedulerUtils.runTask(plugin, () -> player.closeInventory());
 
         int delaySeconds = plugin.getConfig().getInt("teleport.delay", 0);
@@ -195,6 +204,12 @@ public class GUIListener implements Listener {
         int cooldownSeconds = plugin.getConfig().getInt("teleport.cooldown", 0);
         if (cooldownSeconds > 0) {
             plugin.getCooldownManager().setCooldown(player.getUniqueId(), warp.getName());
+        }
+
+        // Register global cooldown
+        int globalCooldownSeconds = plugin.getConfig().getInt("teleport.global-cooldown", 0);
+        if (globalCooldownSeconds > 0) {
+            plugin.getCooldownManager().setGlobalCooldown(player.getUniqueId());
         }
 
         if (plugin.getConfig().getBoolean("teleport.effects.enabled", true)) {

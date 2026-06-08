@@ -66,3 +66,21 @@ help-warp: "&b/warp <name> &f- Teleport to warp"
 help-delwarp: "&b/delwarp <name> &f- Delete warp"
 help-warps: "&b/warps &f- Open warps menu"
 help-warpinfo: "&b/warpinfo <name> &f- Warp info"
+
+# Export/Import Messages
+usage-export: "%prefix%&cUsage: /xsetwarp export <filename> [identifier]"
+usage-import: "%prefix%&cUsage: /xsetwarp import <filename>"
+export-success: "%prefix%&aExported &e%count% &awarps to &b%file%"
+export-failed: "%prefix%&cFailed to export warps."
+import-success: "%prefix%&aImported &e%count% &awarps successfully!"
+import-file-not-found: "%prefix%&cFile not found: &b%file%"
+import-essentials-not-found: "%prefix%&cEssentials plugin is not installed."
+import-cmi-not-found: "%prefix%&cCMI plugin is not installed."
+
+# Global Cooldown
+warp-global-cooldown: "%prefix%&cYou must wait &e%seconds%s &cbefore using any warp."
+
+# Help additions
+help-export: "&b/xsw export <file> [id] &f- Export warps to file"
+help-import: "&b/xsw import <file> &f- Import warps from file"
+help-import-plugins: "&b/xsw import-essentials &f- Import from Essentials"

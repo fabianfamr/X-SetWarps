@@ -62,6 +62,11 @@ teleport:
   # Set to 0 to disable cooldown.
   cooldown: 0
   
+  # Global cooldown in seconds between ANY warp use.
+  # This applies regardless of which warp is used.
+  # Set to 0 to disable global cooldown.
+  global-cooldown: 0
+  
   # Delay in seconds before the teleport takes effect.
   # Set to 0 to teleport instantly.
   delay: 0

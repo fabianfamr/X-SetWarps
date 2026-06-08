@@ -14,6 +14,10 @@ gui:
   enabled: true
   title: "&8Warps"
   rows: 4
+  # Use player heads (creator's skull) as icons for dynamic warps?
+  # When true, ENDER_PEARL is replaced by the creator's PLAYER_HEAD.
+  # Falls back to ENDER_PEARL if the creator name is "unknown".
+  use-player-heads: false
 
 # Filler Settings
 filler:

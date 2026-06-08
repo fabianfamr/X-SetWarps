@@ -336,4 +336,184 @@ public class WarpManager {
         }
         return grouped;
     }
+
+    /**
+     * Export warps from a specific identifier (or all) to a YAML file.
+     * Returns the number of exported warps.
+     */
+    public int exportWarps(String identifier, String fileName) {
+        List<Warp> warpsToExport;
+        if (identifier != null && !identifier.isEmpty()) {
+            Map<String, Warp> map = warpsByFile.get(identifier);
+            warpsToExport = map != null ? new ArrayList<>(map.values()) : new ArrayList<>();
+        } else {
+            warpsToExport = getAllWarps();
+        }
+
+        YamlConfiguration export = new YamlConfiguration();
+        for (Warp warp : warpsToExport) {
+            String path = warp.getName();
+            export.set(path + ".world", warp.getWorldName());
+            export.set(path + ".x", warp.getX());
+            export.set(path + ".y", warp.getY());
+            export.set(path + ".z", warp.getZ());
+            export.set(path + ".yaw", warp.getYaw());
+            export.set(path + ".pitch", warp.getPitch());
+            export.set(path + ".description", warp.getDescription());
+            export.set(path + ".created-by", warp.getCreatedBy());
+            export.set(path + ".created-at", warp.getCreatedAt());
+            export.set(path + ".category", warp.getCategory());
+            if (warp.getPermission() != null && !warp.getPermission().isEmpty()) {
+                export.set(path + ".permission", warp.getPermission());
+            }
+        }
+
+        File exportDir = new File(plugin.getDataFolder(), "exports");
+        if (!exportDir.exists()) exportDir.mkdirs();
+
+        String actualFileName = fileName.endsWith(".yml") ? fileName : fileName + ".yml";
+        File file = new File(exportDir, actualFileName);
+        try {
+            export.save(file);
+            return warpsToExport.size();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    /**
+     * Import warps from an export YAML file.
+     * Returns the number of imported warps.
+     */
+    public int importWarps(String fileName) {
+        String actualFileName = fileName.endsWith(".yml") ? fileName : fileName + ".yml";
+        File file = new File(plugin.getDataFolder(), "exports/" + actualFileName);
+
+        if (!file.exists()) {
+            file = new File(plugin.getDataFolder(), "warps/" + actualFileName);
+        }
+
+        if (!file.exists()) return -1;
+
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+        int count = 0;
+
+        for (String key : config.getKeys(false)) {
+            ConfigurationSection section = config.getConfigurationSection(key);
+            if (section == null) continue;
+
+            String worldName = section.getString("world", "world");
+            if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(worldName))) {
+                worldName = Bukkit.getWorlds().get(0).getName();
+            }
+            double x = section.getDouble("x");
+            double y = section.getDouble("y");
+            double z = section.getDouble("z");
+            float yaw = (float) section.getDouble("yaw");
+            float pitch = (float) section.getDouble("pitch");
+            String description = section.getString("description", "");
+            String createdBy = section.getString("created-by", "imported");
+            long createdAt = section.getLong("created-at", System.currentTimeMillis());
+            String category = section.getString("category", Warp.DEFAULT_IDENTIFIER);
+            String permission = section.getString("permission", "");
+
+            Warp warp = new Warp(key, worldName, x, y, z, yaw, pitch, description, createdBy, createdAt, category);
+            warp.setPermission(permission);
+
+            if (!warpExists(key)) {
+                saveWarp(warp);
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Import warps from Essentials plugin.
+     * Returns the number of imported warps, or -2 if Essentials not found.
+     */
+    public int importEssentialsWarps() {
+        if (Bukkit.getPluginManager().getPlugin("Essentials") == null) return -2;
+
+        File essentialsWarps = new File("plugins/Essentials/warps.yml");
+        if (!essentialsWarps.exists()) return -1;
+
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(essentialsWarps);
+        int count = 0;
+
+        for (String key : config.getKeys(false)) {
+            // Essentials stores location as string: "world:x:y:z:yaw:pitch"
+            String locStr = config.getString(key);
+            if (locStr == null || locStr.isEmpty()) continue;
+
+            String[] parts = locStr.split(":");
+            if (parts.length < 5) continue;
+
+            try {
+                String worldName = parts[0];
+                double x = Double.parseDouble(parts[1]);
+                double y = Double.parseDouble(parts[2]);
+                double z = Double.parseDouble(parts[3]);
+                float yaw = Float.parseFloat(parts[4]);
+                float pitch = parts.length > 5 ? Float.parseFloat(parts[5]) : 0;
+
+                if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(worldName))) {
+                    worldName = Bukkit.getWorlds().get(0).getName();
+                }
+
+                Warp warp = new Warp(key, worldName, x, y, z, yaw, pitch, "", "Essentials", System.currentTimeMillis(), Warp.DEFAULT_IDENTIFIER);
+
+                if (!warpExists(key)) {
+                    saveWarp(warp);
+                    count++;
+                }
+            } catch (NumberFormatException e) {
+                // Skip malformed entries
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Import warps from CMI plugin.
+     * Returns the number of imported warps, or -2 if CMI not found.
+     */
+    public int importCMIWarps() {
+        if (Bukkit.getPluginManager().getPlugin("CMI") == null) return -2;
+
+        File cmiWarps = new File("plugins/CMI/warps.yml");
+        if (!cmiWarps.exists()) return -1;
+
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(cmiWarps);
+        int count = 0;
+
+        // CMI stores warps similar to Essentials
+        for (String key : config.getKeys(false)) {
+            ConfigurationSection section = config.getConfigurationSection(key);
+            if (section == null) continue;
+
+            String worldName = section.getString("World", section.getString("world", "world"));
+            double x = section.getDouble("X", section.getDouble("x", 0));
+            double y = section.getDouble("Y", section.getDouble("y", 0));
+            double z = section.getDouble("Z", section.getDouble("z", 0));
+            float yaw = (float) section.getDouble("Yaw", section.getDouble("yaw", 0));
+            float pitch = (float) section.getDouble("Pitch", section.getDouble("pitch", 0));
+
+            if (!Bukkit.getWorlds().stream().anyMatch(w -> w.getName().equalsIgnoreCase(worldName))) {
+                worldName = Bukkit.getWorlds().get(0).getName();
+            }
+
+            Warp warp = new Warp(key, worldName, x, y, z, yaw, pitch, "", "CMI", System.currentTimeMillis(), Warp.DEFAULT_IDENTIFIER);
+
+            if (!warpExists(key)) {
+                saveWarp(warp);
+                count++;
+            }
+        }
+
+        return count;
+    }
 }
