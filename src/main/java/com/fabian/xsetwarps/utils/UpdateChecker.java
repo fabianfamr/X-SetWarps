@@ -24,10 +24,12 @@ public class UpdateChecker {
     }
 
     public void checkForUpdates() {
+        DebugLogger.debug("UpdateChecker", "Checking for updates (no sender)");
         checkForUpdates(null);
     }
 
     public void checkForUpdates(CommandSender sender) {
+        DebugLogger.debug("UpdateChecker", "Checking for updates (sender: " + (sender != null ? sender.getName() : "console") + ")");
         SchedulerUtil.runTaskAsync(plugin, () -> {
             HttpURLConnection connection = null;
             try {
@@ -50,6 +52,7 @@ public class UpdateChecker {
 
                 if (latestVersion != null && isNewer(current, latestVersion)) {
                     this.updateAvailable = true;
+                    DebugLogger.debug("UpdateChecker", "Update available: " + current + " -> " + latestVersion);
 
                     if (sender != null) {
                         sender.sendMessage(lang.getMessage("update-available", "%current%", current, "%latest%", latestVersion));
@@ -72,6 +75,7 @@ public class UpdateChecker {
                 }
 
             } catch (Exception e) {
+                DebugLogger.debug("UpdateChecker", "Failed to check for updates", e);
                 if (sender != null) {
                     sender.sendMessage(plugin.getLanguageManager().getMessage("update-error"));
                 } else {

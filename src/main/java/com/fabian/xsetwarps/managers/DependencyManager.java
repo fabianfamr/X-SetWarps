@@ -1,6 +1,7 @@
 package com.fabian.xsetwarps.managers;
 
 import com.fabian.xsetwarps.XSetWarps;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import net.byteflux.libby.BukkitLibraryManager;
 import net.byteflux.libby.Library;
 
@@ -30,24 +31,32 @@ public class DependencyManager {
     }
 
     public void loadDependencies() {
+        DebugLogger.debug("DependencyManager", "Loading runtime dependencies via X-API...");
         plugin.getLogger().info("Loading runtime dependencies via X-API...");
 
         // Load Adventure API (for MiniMessage color support) — non-critical
         try {
+            DebugLogger.debug("DependencyManager", "Loading Adventure API dependencies...");
             loadAdventureDependencies();
+            DebugLogger.debug("DependencyManager", "Adventure API loaded successfully");
         } catch (Exception e) {
+            DebugLogger.debug("DependencyManager", "Failed to load Adventure API", e);
             plugin.getLogger().warning("Failed to load Adventure API (colors may be limited): " + e.getMessage());
         }
 
         // Load XSeries (for cross-version materials/sounds) — CRITICAL
         try {
+            DebugLogger.debug("DependencyManager", "Loading XSeries dependency...");
             loadXSeriesDependency();
+            DebugLogger.debug("DependencyManager", "XSeries loaded successfully");
         } catch (Exception e) {
+            DebugLogger.debug("DependencyManager", "Failed to load XSeries", e);
             plugin.getLogger().severe("Failed to load XSeries: " + e.getMessage());
             e.printStackTrace();
         }
 
         plugin.getLogger().info("All dependencies loaded successfully!");
+        DebugLogger.debug("DependencyManager", "All dependencies loaded successfully");
     }
 
     private void loadAdventureDependencies() {

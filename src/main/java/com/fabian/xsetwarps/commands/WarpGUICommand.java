@@ -2,6 +2,7 @@ package com.fabian.xsetwarps.commands;
 
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.managers.LanguageManager;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,6 +21,7 @@ public class WarpGUICommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        DebugLogger.debug("WarpGUICommand", "onCommand() called by " + sender.getName() + ", args: " + String.join(" ", args));
         LanguageManager lang = plugin.getLanguageManager();
 
         if (!(sender instanceof Player)) {
@@ -44,6 +46,7 @@ public class WarpGUICommand implements CommandExecutor {
 
         // Open GUI
         if (plugin.getConfig().getBoolean("gui.enabled", true)) {
+            DebugLogger.debug("WarpGUICommand", "Opening warp GUI for " + player.getName());
             plugin.getGuiManager().openWarpsListGUI(player, 1);
         } else {
             player.performCommand("warps");

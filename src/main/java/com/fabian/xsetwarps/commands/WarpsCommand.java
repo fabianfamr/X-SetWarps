@@ -3,6 +3,7 @@ package com.fabian.xsetwarps.commands;
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.managers.LanguageManager;
 import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,6 +22,7 @@ public class WarpsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        DebugLogger.debug("WarpsCommand", "onCommand() called by " + sender.getName());
         LanguageManager lang = plugin.getLanguageManager();
 
         if (!sender.hasPermission("xsetwarps.warps")) {
@@ -37,18 +39,21 @@ public class WarpsCommand implements CommandExecutor {
         
         // If GUI is enabled, open the warps list GUI
         if (plugin.getConfig().getBoolean("gui.enabled", true)) {
+            DebugLogger.debug("WarpsCommand", "Opening GUI for " + sender.getName());
             plugin.getGuiManager().openWarpsListGUI(player, 1);
             return true;
         }
 
         // Fallback to text list if GUI disabled
         if (plugin.getWarpManager().getTotalWarpCount() == 0) {
+            DebugLogger.debug("WarpsCommand", "No warps to list");
             sender.sendMessage(lang.getMessage(sender, "warps-list-empty"));
             return true;
         }
 
         sender.sendMessage(lang.getMessage(sender, "warps-list-header",
                 "%count%", String.valueOf(plugin.getWarpManager().getTotalWarpCount())));
+        DebugLogger.debug("WarpsCommand", "Listing " + plugin.getWarpManager().getTotalWarpCount() + " warp(s) via text");
         
         List<String> names = new ArrayList<>(plugin.getWarpManager().getWarpNames());
         Collections.sort(names);

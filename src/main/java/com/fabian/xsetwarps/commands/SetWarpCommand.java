@@ -2,6 +2,7 @@ package com.fabian.xsetwarps.commands;
 
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,6 +19,7 @@ public class SetWarpCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        DebugLogger.debug("SetWarpCommand", "onCommand() called by " + sender.getName() + ", args: " + String.join(" ", args));
         if (!(sender instanceof Player)) {
             sender.sendMessage(plugin.getLanguageManager().getMessage("only-players"));
             return true;
@@ -65,12 +67,14 @@ public class SetWarpCommand implements CommandExecutor {
         }
 
         String description = descriptionBuilder.toString();
+        DebugLogger.debug("SetWarpCommand", "Creating warp: " + warpName + ", identifier: " + identifier + ", desc: " + description);
         Warp warp = new Warp(warpName, player.getLocation(), description, player.getName(), identifier);
         boolean saved = plugin.getWarpManager().saveWarp(warp);
 
         if (!saved) {
             // max-warps limit reached
             int maxWarps = plugin.getConfig().getInt("warps.max-warps", -1);
+            DebugLogger.debug("SetWarpCommand", "Max warps limit reached (" + maxWarps + ") for warp: " + warpName);
             player.sendMessage(plugin.getLanguageManager().getMessage(player, "warps-limit-reached", "%limit%", String.valueOf(maxWarps)));
             return true;
         }

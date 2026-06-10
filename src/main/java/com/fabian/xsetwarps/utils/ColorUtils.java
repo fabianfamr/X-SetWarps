@@ -47,6 +47,7 @@ public class ColorUtils {
      */
     public static String translateColors(String text) {
         if (text == null || text.isEmpty()) return text;
+        DebugLogger.debug("ColorUtils", "Translating colors for string (length=" + text.length() + ")");
         text = convertLegacyAndHex(text);
         Component component = MINI_MESSAGE.deserialize(text);
         return LEGACY_SERIALIZER.serialize(component);

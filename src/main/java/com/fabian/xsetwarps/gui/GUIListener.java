@@ -6,6 +6,7 @@ import com.fabian.xsetwarps.managers.CooldownManager;
 import com.fabian.xsetwarps.managers.LanguageManager;
 import com.fabian.xsetwarps.model.Warp;
 import com.fabian.xsetwarps.utils.SchedulerUtil;
+import com.fabian.xsetwarps.utils.DebugLogger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,6 +40,7 @@ public class GUIListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         WarpGUIHolder holder = (WarpGUIHolder) event.getInventory().getHolder();
         int slot = event.getRawSlot();
+        DebugLogger.debug("GUIListener", "Inventory click by " + player.getName() + " at slot " + slot);
 
         if (slot < 0 || slot >= event.getInventory().getSize()) return;
 
@@ -67,6 +69,7 @@ public class GUIListener implements Listener {
         String warpName = guiManager.getWarpAtSlot(player, slot);
         if (warpName == null || warpName.isEmpty()) return;
 
+        DebugLogger.debug("GUIListener", "Warp click detected: " + warpName + " by " + player.getName());
         Warp warp = plugin.getWarpManager().getWarp(warpName);
         if (warp == null) {
             player.sendMessage(plugin.getLanguageManager().getMessage(player, "warp-not-found", "%warp%", warpName));
@@ -144,6 +147,7 @@ public class GUIListener implements Listener {
         if (!(event.getInventory().getHolder() instanceof WarpGUIHolder)) return;
 
         Player player = (Player) event.getPlayer();
+        DebugLogger.debug("GUIListener", "GUI closed by " + player.getName());
         guiManager.cleanupPlayer(player);
     }
 
@@ -194,6 +198,7 @@ public class GUIListener implements Listener {
     }
 
     private void performTeleport(Player player, Warp warp) {
+        DebugLogger.debug("GUIListener", "performTeleport() for " + player.getName() + " to " + warp.getName());
         LanguageManager lang = plugin.getLanguageManager();
 
         Location loc = warp.getLocation();

@@ -2,6 +2,7 @@ package com.fabian.xsetwarps.managers;
 
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.utils.DebugLogger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -30,6 +31,7 @@ public class WarpManager {
         this.plugin = plugin;
         this.warpsByFile = new HashMap<>();
         this.configsByFile = new HashMap<>();
+        DebugLogger.debug("WarpManager", "Constructing WarpManager, loading warps...");
         loadAllWarps();
     }
 
@@ -37,6 +39,7 @@ public class WarpManager {
      * Load all warp files from the warps folder
      */
     public void loadAllWarps() {
+        DebugLogger.debug("WarpManager", "loadAllWarps() called");
         // Remove previously registered dynamic permissions before reloading
         unregisterPermissions();
 
@@ -46,15 +49,20 @@ public class WarpManager {
         File warpsFolder = new File(plugin.getDataFolder(), "warps");
         if (!warpsFolder.exists()) {
             warpsFolder.mkdirs();
+            DebugLogger.debug("WarpManager", "Created warps/ directory");
         }
         
         // Load all yml files from warps folder
         File[] files = warpsFolder.listFiles((dir, name) -> name.endsWith(".yml"));
         if (files != null) {
+            DebugLogger.debug("WarpManager", "Found " + files.length + " warp file(s) in warps/");
             for (File file : files) {
                 String identifier = file.getName().replace(".yml", "");
+                DebugLogger.debug("WarpManager", "Loading warp file: " + identifier + ".yml");
                 loadWarpsFromFile(identifier);
             }
+        } else {
+            DebugLogger.debug("WarpManager", "No warp files found in warps/");
         }
         
         // Create default warps.yml if it doesn't exist
@@ -68,6 +76,7 @@ public class WarpManager {
 
         // Register all warp permissions so LuckPerms and other plugins can see them
         registerPermissions();
+        DebugLogger.debug("WarpManager", "All warps loaded, total count: " + getTotalWarpCount());
     }
 
     /**
@@ -155,6 +164,7 @@ public class WarpManager {
         configsByFile.put(identifier, config);
         
         Map<String, Warp> warpsInFile = new HashMap<>();
+        int count = 0;
         
         for (String key : config.getKeys(false)) {
             ConfigurationSection section = config.getConfigurationSection(key);
@@ -176,9 +186,11 @@ public class WarpManager {
             warp.setPermission(permission);
             warp.setCooldown(cooldown);
             warpsInFile.put(key.toLowerCase(), warp);
+            count++;
         }
         
         warpsByFile.put(identifier, warpsInFile);
+        DebugLogger.debug("WarpManager", "Loaded " + count + " warp(s) from " + identifier + ".yml");
     }
 
     /**
@@ -186,11 +198,13 @@ public class WarpManager {
      */
     public boolean saveWarp(Warp warp) {
         synchronized (warpLock) {
+            DebugLogger.debug("WarpManager", "Saving warp: " + warp.getName() + " (category: " + warp.getCategory() + ")");
             String identifier = warp.getCategory();
             
             // Check max-warps limit (global)
             int maxWarps = plugin.getConfig().getInt("warps.max-warps", -1);
             if (maxWarps > 0 && getTotalWarpCount() >= maxWarps) {
+                DebugLogger.debug("WarpManager", "Max warps limit reached (" + maxWarps + "), cannot save warp: " + warp.getName());
                 return false;
             }
 
@@ -231,7 +245,9 @@ public class WarpManager {
                 config.save(file);
                 // Register the permission so LuckPerms can see it immediately
                 registerWarpPermission(warp);
+                DebugLogger.debug("WarpManager", "Warp saved successfully: " + warp.getName());
             } catch (IOException e) {
+                DebugLogger.debug("WarpManager", "Failed to save warp: " + warp.getName(), e);
                 e.printStackTrace();
                 return false;
             }
@@ -244,8 +260,12 @@ public class WarpManager {
      */
     public void deleteWarp(String name) {
         synchronized (warpLock) {
+            DebugLogger.debug("WarpManager", "Deleting warp: " + name);
             Warp warp = getWarp(name);
-            if (warp == null) return;
+            if (warp == null) {
+                DebugLogger.debug("WarpManager", "Warp not found for deletion: " + name);
+                return;
+            }
             
             String identifier = warp.getCategory();
             Map<String, Warp> warpsInFile = warpsByFile.get(identifier);
@@ -260,7 +280,9 @@ public class WarpManager {
                 try {
                     File file = new File(plugin.getDataFolder(), "warps/" + identifier + ".yml");
                     config.save(file);
+                    DebugLogger.debug("WarpManager", "Warp deleted successfully: " + name);
                 } catch (IOException e) {
+                    DebugLogger.debug("WarpManager", "Failed to delete warp file entry: " + name, e);
                     e.printStackTrace();
                 }
             }
@@ -274,8 +296,12 @@ public class WarpManager {
         String lowerName = name.toLowerCase();
         for (Map<String, Warp> warpsInFile : warpsByFile.values()) {
             Warp warp = warpsInFile.get(lowerName);
-            if (warp != null) return warp;
+            if (warp != null) {
+                DebugLogger.debug("WarpManager", "getWarp(\"" + name + "\") -> found in category: " + warp.getCategory());
+                return warp;
+            }
         }
+        DebugLogger.debug("WarpManager", "getWarp(\"" + name + "\") -> not found");
         return null;
     }
 

@@ -6,6 +6,7 @@ import com.fabian.xsetwarps.managers.CooldownManager;
 import com.fabian.xsetwarps.managers.LanguageManager;
 import com.fabian.xsetwarps.model.Warp;
 import com.fabian.xsetwarps.utils.SchedulerUtil;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -22,6 +23,7 @@ public class WarpCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        DebugLogger.debug("WarpCommand", "onCommand() called by " + sender.getName() + ", args: " + String.join(" ", args));
         LanguageManager lang = plugin.getLanguageManager();
 
         if (!(sender instanceof Player)) {
@@ -44,6 +46,7 @@ public class WarpCommand implements CommandExecutor {
         Warp warp = plugin.getWarpManager().getWarp(warpName);
 
         if (warp == null) {
+            DebugLogger.debug("WarpCommand", "Warp not found: " + warpName);
             player.sendMessage(lang.getMessage(player, "warp-not-found", "%warp%", warpName));
             return true;
         }
@@ -96,8 +99,10 @@ public class WarpCommand implements CommandExecutor {
         // Delay check
         int delaySeconds = plugin.getConfig().getInt("teleport.delay", 0);
         if (delaySeconds > 0) {
+            DebugLogger.debug("WarpCommand", "Starting delayed teleport for " + player.getName() + " to warp " + warp.getName() + " (" + delaySeconds + "s)");
             performDelayedTeleport(player, warp, delaySeconds);
         } else {
+            DebugLogger.debug("WarpCommand", "Executing instant teleport for " + player.getName() + " to warp " + warp.getName());
             performTeleport(player, warp);
         }
 
@@ -105,6 +110,7 @@ public class WarpCommand implements CommandExecutor {
     }
 
     public void performDelayedTeleport(Player player, Warp warp, int delaySeconds) {
+        DebugLogger.debug("WarpCommand", "Delay teleport tick loop started for " + player.getName());
         LanguageManager lang = plugin.getLanguageManager();
         Location startLocation = player.getLocation().clone();
         double tolerance = plugin.getConfig().getDouble("teleport.move-tolerance", 0.5);
@@ -146,6 +152,7 @@ public class WarpCommand implements CommandExecutor {
 
                 ticksRemaining -= 1;
                 if (ticksRemaining <= 0) {
+                    DebugLogger.debug("WarpCommand", "Delay completed, teleporting " + player.getName() + " to " + warp.getName());
                     performTeleport(player, warp);
                     if (taskWrapper[0] != null)
                         taskWrapper[0].cancel();
@@ -155,10 +162,12 @@ public class WarpCommand implements CommandExecutor {
     }
 
     private void performTeleport(Player player, Warp warp) {
+        DebugLogger.debug("WarpCommand", "performTeleport() for " + player.getName() + " to warp " + warp.getName());
         LanguageManager lang = plugin.getLanguageManager();
 
         Location loc = warp.getLocation();
         if (loc == null) {
+            DebugLogger.debug("WarpCommand", "World not loaded for warp " + warp.getName() + ": " + warp.getWorldName());
             player.sendMessage(lang.getMessage(player, "world-not-loaded", "%world%", warp.getWorldName()));
             return;
         }
@@ -166,8 +175,10 @@ public class WarpCommand implements CommandExecutor {
         // Fire WarpTeleportEvent
         WarpTeleportEvent event = new WarpTeleportEvent(player, warp);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled())
+        if (event.isCancelled()) {
+            DebugLogger.debug("WarpCommand", "Teleport cancelled by event for " + player.getName() + " to " + warp.getName());
             return;
+        }
 
         // Register per-warp cooldown BEFORE teleporting (respects warp-specific cooldown)
         int globalCooldownSetting = plugin.getConfig().getInt("teleport.cooldown", 0);
@@ -188,6 +199,7 @@ public class WarpCommand implements CommandExecutor {
         }
 
         player.teleport(loc);
+        DebugLogger.debug("WarpCommand", "Teleported " + player.getName() + " to warp " + warp.getName());
 
         // Play arrival effects
         if (plugin.getConfig().getBoolean("teleport.effects.enabled", true)) {

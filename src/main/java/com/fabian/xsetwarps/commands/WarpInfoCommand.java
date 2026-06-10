@@ -3,6 +3,7 @@ package com.fabian.xsetwarps.commands;
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.managers.LanguageManager;
 import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,6 +21,7 @@ public class WarpInfoCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        DebugLogger.debug("WarpInfoCommand", "onCommand() called by " + sender.getName() + ", args: " + String.join(" ", args));
         LanguageManager lang = plugin.getLanguageManager();
 
         if (!sender.hasPermission("xsetwarps.warpinfo")) {
@@ -36,6 +38,7 @@ public class WarpInfoCommand implements CommandExecutor {
         Warp warp = plugin.getWarpManager().getWarp(warpName);
 
         if (warp == null) {
+            DebugLogger.debug("WarpInfoCommand", "Warp not found: " + warpName);
             sender.sendMessage(lang.getMessage(sender, "warp-not-found", "%warp%", warpName));
             return true;
         }
@@ -43,6 +46,7 @@ public class WarpInfoCommand implements CommandExecutor {
         String desc    = warp.getDescription().isEmpty() ? "-" : warp.getDescription();
         String coords  = String.format("%.1f, %.1f, %.1f", warp.getX(), warp.getY(), warp.getZ());
         String created = DATE_FORMAT.format(new Date(warp.getCreatedAt()));
+        DebugLogger.debug("WarpInfoCommand", "Showing info for warp: " + warp.getName() + " at " + coords);
 
         sender.sendMessage(lang.getMessage(sender, "warpinfo-header",  "%warp%", warp.getName()));
         sender.sendMessage(lang.getMessage(sender, "warpinfo-desc",    "%desc%", desc));

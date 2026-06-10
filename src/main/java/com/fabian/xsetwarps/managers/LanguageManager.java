@@ -2,6 +2,7 @@ package com.fabian.xsetwarps.managers;
 
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.utils.ColorUtils;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -23,15 +24,18 @@ public class LanguageManager {
 
     public LanguageManager(XSetWarps plugin) {
         this.plugin = plugin;
+        DebugLogger.debug("LanguageManager", "Constructing LanguageManager...");
         loadLanguage();
     }
 
     public void loadLanguage() {
+        DebugLogger.debug("LanguageManager", "loadLanguage() called");
         // Reload config without triggering migration logic again
         plugin.reloadConfig();
 
         // Get language from config (use lowercase for file names)
         String lang = plugin.getConfig().getString("language", "en").toLowerCase();
+        DebugLogger.debug("LanguageManager", "Configured language: " + lang);
 
         // Ensure the messages folder exists
         File messagesFolder = new File(plugin.getDataFolder(), "messages");
@@ -68,6 +72,7 @@ public class LanguageManager {
 
         this.messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
         this.currentLang = lang.toUpperCase();
+        DebugLogger.debug("LanguageManager", "Loaded language file: " + lang + ".yml");
 
         // Load defaults from JAR if available
         InputStream defStream = plugin.getResource("messages/" + lang + ".yml");
@@ -99,6 +104,7 @@ public class LanguageManager {
      * Change the language
      */
     public boolean setLanguage(String lang) {
+        DebugLogger.debug("LanguageManager", "Changing language to: " + lang);
         String newLang = lang.toLowerCase();
         List<String> available = getAvailableLanguages();
 
@@ -119,6 +125,7 @@ public class LanguageManager {
         // Reload messages
         this.currentLang = newLang.toUpperCase();
         loadLanguage();
+        DebugLogger.debug("LanguageManager", "Language changed successfully to: " + newLang);
 
         return true;
     }
@@ -130,6 +137,7 @@ public class LanguageManager {
     public String getMessage(String key) {
         String message = messagesConfig.getString(key);
         if (message == null) {
+            DebugLogger.debug("LanguageManager", "Missing message key: " + key);
             return "Missing key: " + key;
         }
 

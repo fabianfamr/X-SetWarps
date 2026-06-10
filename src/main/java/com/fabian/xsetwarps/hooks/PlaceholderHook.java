@@ -2,6 +2,7 @@ package com.fabian.xsetwarps.hooks;
 
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 
@@ -34,6 +35,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
+        DebugLogger.debug("PlaceholderHook", "onRequest() params: " + params);
         if (params.equalsIgnoreCase("total")) {
             return String.valueOf(plugin.getWarpManager().getTotalWarpCount());
         }
@@ -49,6 +51,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
             String warpName = params.substring(9);
             int cooldownSeconds = plugin.getConfig().getInt("teleport.cooldown", 0);
             long remaining = plugin.getCooldownManager().getRemainingSeconds(player.getUniqueId(), warpName, cooldownSeconds);
+            DebugLogger.debug("PlaceholderHook", "Cooldown placeholder for warp \"" + warpName + "\": " + remaining + "s remaining");
             return String.valueOf(remaining);
         }
 
@@ -69,6 +72,6 @@ public class PlaceholderHook extends PlaceholderExpansion {
             return warp != null ? warp.getDescription() : "-";
         }
 
+        DebugLogger.debug("PlaceholderHook", "Unresolved placeholder: " + params);
         return null;
     }
-}

@@ -10,6 +10,10 @@ public class SchedulerUtil {
 
     private static final boolean IS_FOLIA = isClass("io.papermc.paper.threadedregions.RegionizedServer");
 
+    static {
+        DebugLogger.debug("SchedulerUtil", "Folia detected: " + IS_FOLIA);
+    }
+
     public static void runTask(XSetWarps plugin, Runnable runnable) {
         if (IS_FOLIA) {
             try {
@@ -25,6 +29,7 @@ public class SchedulerUtil {
     }
 
     public static void runTaskAsync(XSetWarps plugin, Runnable runnable) {
+        DebugLogger.debug("SchedulerUtil", "runTaskAsync() called");
         if (IS_FOLIA) {
             try {
                 Object scheduler = Bukkit.class.getMethod("getAsyncScheduler").invoke(null);

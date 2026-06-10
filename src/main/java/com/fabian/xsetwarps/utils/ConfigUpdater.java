@@ -11,6 +11,7 @@ import java.util.List;
 public class ConfigUpdater {
 
     public static void update(XSetWarps plugin, String resourcePath, File diskFile) {
+        DebugLogger.debug("ConfigUpdater", "Checking updates for " + diskFile.getName());
         if (!diskFile.exists()) return;
         try {
             YamlConfiguration resConfig = null;
@@ -40,8 +41,10 @@ public class ConfigUpdater {
             }
 
             if (isFlat) {
+                DebugLogger.debug("ConfigUpdater", "Updating flat file: " + diskFile.getName());
                 updateFlatFile(plugin, resourcePath, diskFile, diskConfig);
             } else {
+                DebugLogger.debug("ConfigUpdater", "Updating hierarchical file: " + diskFile.getName());
                 updateHierarchicalFile(plugin, diskFile, diskConfig, resConfig);
             }
         } catch (Exception e) {
@@ -84,6 +87,7 @@ public class ConfigUpdater {
             if (!diskConfig.contains(key)) missingKeys.add(key);
         }
         if (missingKeys.isEmpty()) return;
+        DebugLogger.debug("ConfigUpdater", "Adding " + missingKeys.size() + " missing key(s) to " + diskFile.getName());
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(diskFile, true), StandardCharsets.UTF_8))) {
             writer.newLine();

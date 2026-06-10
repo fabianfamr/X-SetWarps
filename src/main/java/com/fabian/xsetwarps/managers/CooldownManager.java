@@ -1,6 +1,7 @@
 package com.fabian.xsetwarps.managers;
 
 import com.fabian.xsetwarps.XSetWarps;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -8,7 +9,7 @@ import java.util.UUID;
 public class CooldownManager {
 
     public CooldownManager(XSetWarps plugin) {
-        // Plugin instance kept for future use if needed, or constructor simplified
+        DebugLogger.debug("CooldownManager", "CooldownManager initialized");
     }
 
     // UUID -> (warpName -> timestamp of last use)
@@ -26,7 +27,11 @@ public class CooldownManager {
         if (playerCooldowns == null) return false;
         Long lastUse = playerCooldowns.get(warpName.toLowerCase());
         if (lastUse == null) return false;
-        return (System.currentTimeMillis() - lastUse) < (cooldownSeconds * 1000L);
+        boolean onCooldown = (System.currentTimeMillis() - lastUse) < (cooldownSeconds * 1000L);
+        if (onCooldown) {
+            DebugLogger.debug("CooldownManager", "Player " + uuid + " is on cooldown for warp: " + warpName);
+        }
+        return onCooldown;
     }
 
     /**
@@ -47,6 +52,7 @@ public class CooldownManager {
      * Registers a warp use for the given player (sets the cooldown timestamp).
      */
     public void setCooldown(UUID uuid, String warpName) {
+        DebugLogger.debug("CooldownManager", "Setting cooldown for player " + uuid + " warp: " + warpName);
         cooldowns.computeIfAbsent(uuid, k -> new HashMap<>())
                  .put(warpName.toLowerCase(), System.currentTimeMillis());
     }
@@ -89,6 +95,7 @@ public class CooldownManager {
      * Registers a global warp use for the given player.
      */
     public void setGlobalCooldown(UUID uuid) {
+        DebugLogger.debug("CooldownManager", "Setting global cooldown for player " + uuid);
         globalCooldowns.put(uuid, System.currentTimeMillis());
     }
 
@@ -96,6 +103,7 @@ public class CooldownManager {
      * Clears all cooldowns for a player (e.g. on disconnect).
      */
     public void clearCooldowns(UUID uuid) {
+        DebugLogger.debug("CooldownManager", "Clearing all cooldowns for player " + uuid);
         cooldowns.remove(uuid);
         globalCooldowns.remove(uuid);
     }

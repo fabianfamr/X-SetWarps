@@ -23,10 +23,12 @@ public class TeleportEffects {
     
     public TeleportEffects(XSetWarps plugin) {
         this.plugin = plugin;
+        DebugLogger.debug("TeleportEffects", "Initializing TeleportEffects...");
         loadSettings();
     }
     
     public void loadSettings() {
+        DebugLogger.debug("TeleportEffects", "Reloading effect settings");
         FileConfiguration config = plugin.getConfig();
         
         enabled = config.getBoolean("teleport.effects.enabled", true);
@@ -44,7 +46,7 @@ public class TeleportEffects {
      */
     public void playTeleportIn(Location loc) {
         if (!enabled || !soundEnabled || loc.getWorld() == null) return;
-        
+        DebugLogger.debug("TeleportEffects", "Playing teleport sound at " + loc.getWorld().getName() + " (" + soundName + ")");
         try {
             XSound sound = XSound.matchXSound(soundName).orElse(XSound.ENTITY_ENDERMAN_TELEPORT);
             org.bukkit.Sound parsed = sound.parseSound();
@@ -57,6 +59,7 @@ public class TeleportEffects {
                 org.bukkit.Sound fallback = org.bukkit.Sound.valueOf("ENTITY_ENDERMAN_TELEPORT");
                 loc.getWorld().playSound(loc, fallback, soundVolume, soundPitch);
             } catch (Exception ex) {
+                DebugLogger.debug("TeleportEffects", "Failed to play teleport sound: " + soundName, ex);
                 plugin.getLogger().warning("Failed to play teleport sound: " + soundName);
             }
         }

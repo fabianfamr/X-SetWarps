@@ -2,6 +2,7 @@ package com.fabian.xsetwarps.commands;
 
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.managers.LanguageManager;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,6 +23,7 @@ public class MainCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        DebugLogger.debug("MainCommand", "onCommand() called by " + sender.getName() + ", args: " + String.join(" ", args));
         LanguageManager lang = plugin.getLanguageManager();
 
         if (args.length == 0) {
@@ -63,12 +65,14 @@ public class MainCommand implements CommandExecutor {
 
         switch (subCommand) {
             case "reload":
+                DebugLogger.debug("MainCommand", "Executing reload subcommand");
                 plugin.reloadConfig();
                 plugin.getWarpManager().loadAllWarps();
                 plugin.getLanguageManager().loadLanguage();
                 plugin.getGuiManager().reload();
                 plugin.getTeleportEffects().loadSettings();
                 sender.sendMessage(lang.getMessage("reload-success"));
+                DebugLogger.debug("MainCommand", "Reload complete");
                 break;
             case "update":
                 plugin.getUpdateChecker().checkForUpdates(sender);

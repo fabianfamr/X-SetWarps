@@ -2,6 +2,7 @@ package com.fabian.xsetwarps.commands;
 
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -23,6 +24,7 @@ public class WarpTabCompleter implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
+        DebugLogger.debug("WarpTabCompleter", "Tab complete for command '" + command.getName() + "', args length: " + args.length);
         
         // Handle xsetwarp subcommands
         if (command.getName().equalsIgnoreCase("xsetwarp")) {

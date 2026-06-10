@@ -3,6 +3,7 @@ package com.fabian.xsetwarps.gui;
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.model.Warp;
 import com.fabian.xsetwarps.utils.ColorUtils;
+import com.fabian.xsetwarps.utils.DebugLogger;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.profiles.builder.XSkull;
@@ -78,10 +79,12 @@ public class GUIManager {
 
     public GUIManager(XSetWarps plugin) {
         this.plugin = plugin;
+        DebugLogger.debug("GUIManager", "Constructing GUIManager...");
         loadConfig();
     }
 
     public void loadConfig() {
+        DebugLogger.debug("GUIManager", "Loading GUI config...");
         File guiFile = new File(plugin.getDataFolder(), "gui.yml");
         if (!guiFile.exists()) {
             plugin.saveResource("gui.yml", false);
@@ -140,6 +143,7 @@ public class GUIManager {
     }
 
     public void openWarpsListGUI(Player player, int page) {
+        DebugLogger.debug("GUIManager", "Opening GUI for " + player.getName() + ", page " + page);
         if (page < 1) page = 1;
 
         List<Warp> allWarps = plugin.getWarpManager().getAllWarps();
@@ -222,6 +226,7 @@ public class GUIManager {
 
         openWarpSlots.put(player.getUniqueId(), slotWarpMap);
         player.openInventory(inv);
+        DebugLogger.debug("GUIManager", "GUI opened for " + player.getName() + ", " + dynamicWarps.size() + " warp items on page " + page + "/" + totalPages);
     }
 
     private void fillInventory(Inventory inv) {
@@ -449,11 +454,14 @@ public class GUIManager {
     }
 
     public void reload() {
+        DebugLogger.debug("GUIManager", "Reloading GUIManager...");
         loadConfig();
         openWarpSlots.clear();
+        DebugLogger.debug("GUIManager", "GUIManager reloaded");
     }
 
     public void cleanupPlayer(Player player) {
+        DebugLogger.debug("GUIManager", "Cleaning up GUI data for " + player.getName());
         openWarpSlots.remove(player.getUniqueId());
     }
 

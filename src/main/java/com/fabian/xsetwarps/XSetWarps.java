@@ -11,6 +11,7 @@ import com.fabian.xsetwarps.managers.LanguageManager;
 import com.fabian.xsetwarps.managers.WarpManager;
 import com.fabian.xsetwarps.utils.ColorUtils;
 import com.fabian.xsetwarps.utils.ConfigUpdater;
+import com.fabian.xsetwarps.utils.DebugLogger;
 import com.fabian.xsetwarps.utils.TeleportEffects;
 import com.fabian.xsetwarps.utils.UpdateChecker;
 import org.bukkit.Bukkit;
@@ -49,6 +50,7 @@ public class XSetWarps extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        DebugLogger.debug("Lifecycle", "onLoad() called");
         getLogger().info("X-SetWarps Pre-Load Started...");
         new DependencyManager(this).loadDependencies();
     }
@@ -56,21 +58,28 @@ public class XSetWarps extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        DebugLogger.debug("Lifecycle", "onEnable() started");
 
         // Load and update config
         saveDefaultConfig();
+        DebugLogger.debug("Config", "Default config saved/loaded");
         updateConfig();
         checkConfigCode();
 
         // Initialize Managers
+        DebugLogger.debug("Lifecycle", "Initializing managers...");
         this.languageManager = new LanguageManager(this);
+        DebugLogger.debug("Lifecycle", "LanguageManager initialized");
         this.warpManager = new WarpManager(this);
+        DebugLogger.debug("Lifecycle", "WarpManager initialized");
         this.cooldownManager = new CooldownManager(this);
         this.updateChecker = new UpdateChecker(this);
         this.guiManager = new GUIManager(this);
         this.teleportEffects = new TeleportEffects(this);
+        DebugLogger.debug("Lifecycle", "All managers initialized");
 
         // Register Commands
+        DebugLogger.debug("Lifecycle", "Registering commands...");
         getCommand("xsetwarp").setExecutor(new MainCommand(this));
         getCommand("setwarp").setExecutor(new SetWarpCommand(this));
         getCommand("warp").setExecutor(new WarpCommand(this));
@@ -85,6 +94,7 @@ public class XSetWarps extends JavaPlugin {
         getCommand("warpinfo").setExecutor(warpInfoCommand);
 
         // Register Tab Completers
+        DebugLogger.debug("Lifecycle", "Registering tab completers...");
         WarpTabCompleter tabCompleter = new WarpTabCompleter(this);
         getCommand("warp").setTabCompleter(tabCompleter);
         getCommand("delwarp").setTabCompleter(tabCompleter);
@@ -92,14 +102,19 @@ public class XSetWarps extends JavaPlugin {
         getCommand("xsetwarp").setTabCompleter(tabCompleter);
 
         // Register Listeners
+        DebugLogger.debug("Lifecycle", "Registering listeners...");
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new GUIListener(this, guiManager), this);
 
         // PlaceholderAPI soft hook
         String papiStatus = "&cNot Found";
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            DebugLogger.debug("PAPI", "PlaceholderAPI found, registering hook...");
             new PlaceholderHook(this).register();
             papiStatus = "&aRegistered";
+            DebugLogger.debug("PAPI", "PlaceholderAPI hook registered successfully");
+        } else {
+            DebugLogger.debug("PAPI", "PlaceholderAPI not found, skipping hook");
         }
 
         // Stylized startup message
@@ -147,6 +162,7 @@ public class XSetWarps extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        DebugLogger.debug("Lifecycle", "onDisable() called");
         String version = getDescription().getVersion();
 
         getServer().getConsoleSender().sendMessage(
@@ -206,6 +222,7 @@ public class XSetWarps extends JavaPlugin {
         int diskCode = diskConfig.getInt("code", 0);
 
         if (diskCode < jarCode) {
+            DebugLogger.debug("Config", "Config code outdated (disk=" + diskCode + ", jar=" + jarCode + "), rebuilding...");
             getLogger().info("Config code outdated (disk=" + diskCode + ", jar=" + jarCode + "). Rebuilding config...");
 
             // Backup current config
@@ -229,6 +246,7 @@ public class XSetWarps extends JavaPlugin {
     }
 
     private void updateConfig() {
+        DebugLogger.debug("Config", "Running config migrations...");
         FileConfiguration config = getConfig();
         boolean changed = false;
 
@@ -305,11 +323,16 @@ public class XSetWarps extends JavaPlugin {
 
         if (changed) {
             saveConfig();
+            DebugLogger.debug("Config", "Config migrations applied, saved to disk");
             getLogger().info("Config.yml has been updated to the latest format.");
+        } else {
+            DebugLogger.debug("Config", "No config migrations needed");
         }
 
         // Run ConfigUpdater to add any missing keys from the JAR resource
+        DebugLogger.debug("Config", "Running ConfigUpdater to add missing keys...");
         ConfigUpdater.update(this, "config.yml", new File(getDataFolder(), "config.yml"));
         reloadConfig();
+        DebugLogger.debug("Config", "Config update complete");
     }
 }
