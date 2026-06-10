@@ -32,65 +32,12 @@ public class DependencyManager {
     public void loadDependencies() {
         try {
             plugin.getLogger().info("Loading runtime dependencies via X-API...");
-            loadAdventureDependencies();
             loadXSeriesDependency();
             plugin.getLogger().info("All dependencies loaded successfully!");
         } catch (Exception e) {
             plugin.getLogger().severe("Failed to load dependencies: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    private void loadAdventureDependencies() {
-        Library adventureApi = Library.builder()
-                .groupId("net.kyori")
-                .artifactId("adventure-api")
-                .version("4.14.0")
-                .build();
-
-        Library miniMessage = Library.builder()
-                .groupId("net.kyori")
-                .artifactId("adventure-text-minimessage")
-                .version("4.14.0")
-                .build();
-
-        Library legacySerializer = Library.builder()
-                .groupId("net.kyori")
-                .artifactId("adventure-text-serializer-legacy")
-                .version("4.14.0")
-                .build();
-
-        Library plainSerializer = Library.builder()
-                .groupId("net.kyori")
-                .artifactId("adventure-text-serializer-plain")
-                .version("4.14.0")
-                .build();
-
-        Library key = Library.builder()
-                .groupId("net.kyori")
-                .artifactId("adventure-key")
-                .version("4.14.0")
-                .build();
-
-        Library examinationApi = Library.builder()
-                .groupId("net.kyori")
-                .artifactId("examination-api")
-                .version("1.3.0")
-                .build();
-
-        Library examinationString = Library.builder()
-                .groupId("net.kyori")
-                .artifactId("examination-string")
-                .version("1.3.0")
-                .build();
-
-        libraryManager.loadLibrary(adventureApi);
-        libraryManager.loadLibrary(miniMessage);
-        libraryManager.loadLibrary(legacySerializer);
-        libraryManager.loadLibrary(plainSerializer);
-        libraryManager.loadLibrary(key);
-        libraryManager.loadLibrary(examinationApi);
-        libraryManager.loadLibrary(examinationString);
     }
 
     private void loadXSeriesDependency() {
