@@ -6,7 +6,7 @@ import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Method;
 
-public class SchedulerUtils {
+public class SchedulerUtil {
 
     private static final boolean IS_FOLIA = isClass("io.papermc.paper.threadedregions.RegionScheduler");
 

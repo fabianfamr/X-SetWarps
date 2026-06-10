@@ -89,7 +89,7 @@ public class TeleportEffects {
         
         // Schedule arrival sound
         final Location dest = player.getLocation().clone();
-        SchedulerUtils.runAtEntityLater(plugin, player, () -> {
+        SchedulerUtil.runAtEntityLater(plugin, player, () -> {
             if (player.isOnline()) {
                 playTeleportOut(dest);
             }

@@ -4,38 +4,65 @@ import com.fabian.xsetwarps.XSetWarps;
 import net.byteflux.libby.BukkitLibraryManager;
 import net.byteflux.libby.Library;
 
-
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class DependencyManager {
+
     private final XSetWarps plugin;
     private final BukkitLibraryManager libraryManager;
 
     public DependencyManager(XSetWarps plugin) {
         this.plugin = plugin;
-        this.libraryManager = new BukkitLibraryManager(plugin);
+        try {
+            Path xapiPath = Paths.get(plugin.getDataFolder().getParent(), "X-API");
+            Files.createDirectories(xapiPath);
+            this.libraryManager = new BukkitLibraryManager(plugin, xapiPath);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Could not create X-API directory, using default: " + e.getMessage());
+            this.libraryManager = new BukkitLibraryManager(plugin);
+        }
+        this.libraryManager.addMavenCentral();
+        this.libraryManager.addSonatype();
+        this.libraryManager.addRepository("https://repo.papermc.io/repository/maven-public/");
+        this.libraryManager.addJitPack();
     }
 
     public void loadDependencies() {
-        plugin.getLogger().info("Loading dependencies with Libby...");
-        libraryManager.addMavenCentral();
-        libraryManager.addJitPack(); // Important for XSeries
+        try {
+            plugin.getLogger().info("Loading runtime dependencies via X-API...");
+            loadAdventureDependencies();
+            loadXSeriesDependency();
+            plugin.getLogger().info("All dependencies loaded successfully!");
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to load dependencies: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
-        // Define Adventure and MiniMessage libraries
-        Library minimessage = Library.builder()
+    private void loadAdventureDependencies() {
+        Library adventureApi = Library.builder()
+                .groupId("net.kyori")
+                .artifactId("adventure-api")
+                .version("4.14.0")
+                .build();
+
+        Library miniMessage = Library.builder()
                 .groupId("net.kyori")
                 .artifactId("adventure-text-minimessage")
                 .version("4.14.0")
                 .build();
 
-        Library legacy = Library.builder()
+        Library legacySerializer = Library.builder()
                 .groupId("net.kyori")
                 .artifactId("adventure-text-serializer-legacy")
                 .version("4.14.0")
                 .build();
-                
-        Library api = Library.builder()
+
+        Library plainSerializer = Library.builder()
                 .groupId("net.kyori")
-                .artifactId("adventure-api")
+                .artifactId("adventure-text-serializer-plain")
                 .version("4.14.0")
                 .build();
 
@@ -44,35 +71,35 @@ public class DependencyManager {
                 .artifactId("adventure-key")
                 .version("4.14.0")
                 .build();
-                
-        Library gson = Library.builder()
+
+        Library examinationApi = Library.builder()
                 .groupId("net.kyori")
-                .artifactId("adventure-text-serializer-gson")
-                .version("4.14.0")
+                .artifactId("examination-api")
+                .version("1.3.0")
                 .build();
 
+        Library examinationString = Library.builder()
+                .groupId("net.kyori")
+                .artifactId("examination-string")
+                .version("1.3.0")
+                .build();
+
+        libraryManager.loadLibrary(adventureApi);
+        libraryManager.loadLibrary(miniMessage);
+        libraryManager.loadLibrary(legacySerializer);
+        libraryManager.loadLibrary(plainSerializer);
+        libraryManager.loadLibrary(key);
+        libraryManager.loadLibrary(examinationApi);
+        libraryManager.loadLibrary(examinationString);
+    }
+
+    private void loadXSeriesDependency() {
         Library xseries = Library.builder()
                 .groupId("com.github.cryptomorin")
                 .artifactId("XSeries")
                 .version("13.6.0")
                 .build();
 
-        // Load libraries
-        try {
-            plugin.getLogger().info("Downloading Adventure API...");
-            libraryManager.loadLibrary(api);
-            libraryManager.loadLibrary(key);
-            libraryManager.loadLibrary(gson);
-            libraryManager.loadLibrary(minimessage);
-            libraryManager.loadLibrary(legacy);
-            
-            plugin.getLogger().info("Downloading XSeries...");
-            libraryManager.loadLibrary(xseries);
-            
-            plugin.getLogger().info("All dependencies loaded successfully!");
-        } catch (Exception e) {
-            plugin.getLogger().severe("Failed to load dependencies: " + e.getMessage());
-            e.printStackTrace();
-        }
+        libraryManager.loadLibrary(xseries);
     }
 }

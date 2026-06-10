@@ -1,7 +1,7 @@
 name: X-SetWarps
 version: 1.3
 main: com.fabian.xsetwarps.XSetWarps
-author: Fabian ツ
+authors: [Fabian]
 description: Advanced warp plugin with GUI support and multi-file warps.
 api-version: "1.13"
 softdepend: [PlaceholderAPI, Essentials, CMI]

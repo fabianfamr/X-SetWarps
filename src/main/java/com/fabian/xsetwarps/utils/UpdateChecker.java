@@ -28,7 +28,7 @@ public class UpdateChecker {
     }
 
     public void checkForUpdates(CommandSender sender) {
-        SchedulerUtils.runTaskAsync(plugin, () -> {
+        SchedulerUtil.runTaskAsync(plugin, () -> {
             HttpURLConnection connection = null;
             try {
                 String current = plugin.getDescription().getVersion();
@@ -55,7 +55,7 @@ public class UpdateChecker {
                         sender.sendMessage(lang.getMessage("update-available", "%current%", current, "%latest%", latestVersion));
                         sender.sendMessage(lang.getMessage("update-download", "%url%", getDownloadUrl()));
                     } else {
-                        SchedulerUtils.runTask(plugin, () -> {
+                        SchedulerUtil.runTask(plugin, () -> {
                             Bukkit.getConsoleSender()
                                     .sendMessage(lang.getMessage("update-available", "%current%", current, "%latest%", latestVersion));
                             Bukkit.getConsoleSender().sendMessage(lang.getMessage("update-download", "%url%", getDownloadUrl()));
@@ -65,7 +65,7 @@ public class UpdateChecker {
                     if (sender != null) {
                         sender.sendMessage(lang.getMessage("update-current"));
                     } else {
-                        SchedulerUtils.runTask(plugin, () -> {
+                        SchedulerUtil.runTask(plugin, () -> {
                             Bukkit.getConsoleSender().sendMessage(lang.getMessage("update-current"));
                         });
                     }
@@ -75,7 +75,7 @@ public class UpdateChecker {
                 if (sender != null) {
                     sender.sendMessage(plugin.getLanguageManager().getMessage("update-error"));
                 } else {
-                    SchedulerUtils.runTask(plugin, () -> {
+                    SchedulerUtil.runTask(plugin, () -> {
                         Bukkit.getConsoleSender().sendMessage(plugin.getLanguageManager().getMessage("update-error"));
                     });
                 }

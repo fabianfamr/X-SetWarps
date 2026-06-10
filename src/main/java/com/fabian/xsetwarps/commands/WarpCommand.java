@@ -5,7 +5,7 @@ import com.fabian.xsetwarps.events.WarpTeleportEvent;
 import com.fabian.xsetwarps.managers.CooldownManager;
 import com.fabian.xsetwarps.managers.LanguageManager;
 import com.fabian.xsetwarps.model.Warp;
-import com.fabian.xsetwarps.utils.SchedulerUtils;
+import com.fabian.xsetwarps.utils.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -111,8 +111,8 @@ public class WarpCommand implements CommandExecutor {
         player.sendMessage(lang.getMessage(player, "warp-delay", "%warp%", warp.getName(), "%seconds%",
                 String.valueOf(delaySeconds)));
 
-        SchedulerUtils.TaskWrapper taskWrapper[] = new SchedulerUtils.TaskWrapper[1];
-        taskWrapper[0] = SchedulerUtils.runAtEntityTimer(plugin, player, new Runnable() {
+        SchedulerUtil.TaskWrapper taskWrapper[] = new SchedulerUtil.TaskWrapper[1];
+        taskWrapper[0] = SchedulerUtil.runAtEntityTimer(plugin, player, new Runnable() {
             int ticksRemaining = delaySeconds * 20;
 
             @Override

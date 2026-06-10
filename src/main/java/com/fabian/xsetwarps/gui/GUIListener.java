@@ -5,7 +5,7 @@ import com.fabian.xsetwarps.events.WarpTeleportEvent;
 import com.fabian.xsetwarps.managers.CooldownManager;
 import com.fabian.xsetwarps.managers.LanguageManager;
 import com.fabian.xsetwarps.model.Warp;
-import com.fabian.xsetwarps.utils.SchedulerUtils;
+import com.fabian.xsetwarps.utils.SchedulerUtil;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -46,7 +46,7 @@ public class GUIListener implements Listener {
         if (item == null || item.getType() == Material.AIR) return;
 
         if (guiManager.isCloseSlot(slot)) {
-            SchedulerUtils.runTask(plugin, () -> player.closeInventory());
+            SchedulerUtil.runTask(plugin, () -> player.closeInventory());
             return;
         }
 
@@ -70,7 +70,7 @@ public class GUIListener implements Listener {
         Warp warp = plugin.getWarpManager().getWarp(warpName);
         if (warp == null) {
             player.sendMessage(plugin.getLanguageManager().getMessage(player, "warp-not-found", "%warp%", warpName));
-            SchedulerUtils.runTask(plugin, () -> player.closeInventory());
+            SchedulerUtil.runTask(plugin, () -> player.closeInventory());
             return;
         }
 
@@ -121,7 +121,7 @@ public class GUIListener implements Listener {
             }
         }
 
-        SchedulerUtils.runTask(plugin, () -> player.closeInventory());
+        SchedulerUtil.runTask(plugin, () -> player.closeInventory());
 
         int delaySeconds = plugin.getConfig().getInt("teleport.delay", 0);
         if (delaySeconds > 0) {
@@ -155,8 +155,8 @@ public class GUIListener implements Listener {
                 "%warp%", warp.getName(),
                 "%seconds%", String.valueOf(delaySeconds)));
 
-        SchedulerUtils.TaskWrapper[] taskWrapper = new SchedulerUtils.TaskWrapper[1];
-        taskWrapper[0] = SchedulerUtils.runAtEntityTimer(plugin, player, new Runnable() {
+        SchedulerUtil.TaskWrapper[] taskWrapper = new SchedulerUtil.TaskWrapper[1];
+        taskWrapper[0] = SchedulerUtil.runAtEntityTimer(plugin, player, new Runnable() {
             int ticksRemaining = delaySeconds * 20;
 
             @Override

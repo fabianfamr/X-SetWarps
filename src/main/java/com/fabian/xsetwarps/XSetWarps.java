@@ -18,6 +18,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class XSetWarps extends JavaPlugin {
+
+    private static XSetWarps instance;
+
+    public static XSetWarps getInstance() {
+        return instance;
+    }
+
+    public void logInfo(String message) {
+        getLogger().info(message);
+    }
+
+    public void logError(String message) {
+        getLogger().severe(message);
+    }
+
     private WarpManager warpManager;
     private LanguageManager languageManager;
     private CooldownManager cooldownManager;
@@ -33,6 +48,8 @@ public class XSetWarps extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
+
         // Load and update config
         saveDefaultConfig();
         updateConfig();
