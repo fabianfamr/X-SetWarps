@@ -13,22 +13,6 @@ commands:
     description: Main command for X-SetWarps
     aliases: [xsw]
     permission: xsetwarps.admin
-  setwarp:
-    description: Create a new warp
-    permission: xsetwarps.setwarp
-  warp:
-    description: Teleport to a warp
-    permission: xsetwarps.warp
-  delwarp:
-    description: Delete an existing warp
-    permission: xsetwarps.delwarp
-  warps:
-    description: List all warps or open GUI
-    aliases: [warpgui]
-    permission: xsetwarps.warps
-  warpinfo:
-    description: Show information about a warp
-    permission: xsetwarps.warpinfo
 
 permissions:
   xsetwarps.*:

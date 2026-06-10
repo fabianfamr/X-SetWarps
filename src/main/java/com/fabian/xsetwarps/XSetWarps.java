@@ -10,6 +10,7 @@ import com.fabian.xsetwarps.managers.CooldownManager;
 import com.fabian.xsetwarps.managers.LanguageManager;
 import com.fabian.xsetwarps.managers.WarpManager;
 import com.fabian.xsetwarps.utils.ColorUtils;
+import com.fabian.xsetwarps.utils.CommandRegistrar;
 import com.fabian.xsetwarps.utils.ConfigUpdater;
 import com.fabian.xsetwarps.utils.DebugLogger;
 import com.fabian.xsetwarps.utils.TeleportEffects;
@@ -80,26 +81,21 @@ public class XSetWarps extends JavaPlugin {
 
         // Register Commands
         DebugLogger.debug("Lifecycle", "Registering commands...");
-        getCommand("xsetwarp").setExecutor(new MainCommand(this));
-        getCommand("setwarp").setExecutor(new SetWarpCommand(this));
-        getCommand("warp").setExecutor(new WarpCommand(this));
-
-        DelWarpCommand delWarpCommand = new DelWarpCommand(this);
-        getCommand("delwarp").setExecutor(delWarpCommand);
-
-        WarpsCommand warpsCommand = new WarpsCommand(this);
-        getCommand("warps").setExecutor(warpsCommand);
-
-        WarpInfoCommand warpInfoCommand = new WarpInfoCommand(this);
-        getCommand("warpinfo").setExecutor(warpInfoCommand);
-
-        // Register Tab Completers
-        DebugLogger.debug("Lifecycle", "Registering tab completers...");
+        CommandRegistrar registrar = new CommandRegistrar(this);
         WarpTabCompleter tabCompleter = new WarpTabCompleter(this);
-        getCommand("warp").setTabCompleter(tabCompleter);
-        getCommand("delwarp").setTabCompleter(tabCompleter);
-        getCommand("warpinfo").setTabCompleter(tabCompleter);
+
+        // Register the main command from plugin.yml
+        getCommand("xsetwarp").setExecutor(new MainCommand(this));
         getCommand("xsetwarp").setTabCompleter(tabCompleter);
+
+        // Register sub-commands dynamically
+        registrar.register("setwarp", new SetWarpCommand(this), null);
+        registrar.register("warp", new WarpCommand(this), tabCompleter);
+        registrar.register("delwarp", new DelWarpCommand(this), tabCompleter);
+        registrar.register("warps", new WarpsCommand(this), null, "warpgui");
+        registrar.register("warpinfo", new WarpInfoCommand(this), tabCompleter);
+
+        DebugLogger.debug("Lifecycle", "All commands registered");
 
         // Register Listeners
         DebugLogger.debug("Lifecycle", "Registering listeners...");
