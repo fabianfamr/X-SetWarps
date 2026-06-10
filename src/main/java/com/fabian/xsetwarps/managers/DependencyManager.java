@@ -30,23 +30,45 @@ public class DependencyManager {
     }
 
     public void loadDependencies() {
+        plugin.getLogger().info("Loading runtime dependencies via X-API...");
+
+        // Load Adventure API (for MiniMessage color support) — non-critical
         try {
-            plugin.getLogger().info("Loading runtime dependencies via X-API...");
-            loadXSeriesDependency();
-            plugin.getLogger().info("All dependencies loaded successfully!");
+            loadAdventureDependencies();
         } catch (Exception e) {
-            plugin.getLogger().severe("Failed to load dependencies: " + e.getMessage());
+            plugin.getLogger().warning("Failed to load Adventure API (colors may be limited): " + e.getMessage());
+        }
+
+        // Load XSeries (for cross-version materials/sounds) — CRITICAL
+        try {
+            loadXSeriesDependency();
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to load XSeries: " + e.getMessage());
             e.printStackTrace();
         }
+
+        plugin.getLogger().info("All dependencies loaded successfully!");
+    }
+
+    private void loadAdventureDependencies() {
+        libraryManager.loadLibrary(Library.builder()
+                .groupId("net.kyori").artifactId("adventure-api").version("4.14.0").build());
+        libraryManager.loadLibrary(Library.builder()
+                .groupId("net.kyori").artifactId("adventure-text-minimessage").version("4.14.0").build());
+        libraryManager.loadLibrary(Library.builder()
+                .groupId("net.kyori").artifactId("adventure-text-serializer-legacy").version("4.14.0").build());
+        libraryManager.loadLibrary(Library.builder()
+                .groupId("net.kyori").artifactId("adventure-text-serializer-plain").version("4.14.0").build());
+        libraryManager.loadLibrary(Library.builder()
+                .groupId("net.kyori").artifactId("adventure-key").version("4.14.0").build());
+        libraryManager.loadLibrary(Library.builder()
+                .groupId("net.kyori").artifactId("examination-api").version("1.3.0").build());
+        libraryManager.loadLibrary(Library.builder()
+                .groupId("net.kyori").artifactId("examination-string").version("1.3.0").build());
     }
 
     private void loadXSeriesDependency() {
-        Library xseries = Library.builder()
-                .groupId("com.github.cryptomorin")
-                .artifactId("XSeries")
-                .version("13.6.0")
-                .build();
-
-        libraryManager.loadLibrary(xseries);
+        libraryManager.loadLibrary(Library.builder()
+                .groupId("com.github.cryptomorin").artifactId("XSeries").version("13.6.0").build());
     }
 }

@@ -10,12 +10,19 @@ import com.fabian.xsetwarps.managers.CooldownManager;
 import com.fabian.xsetwarps.managers.LanguageManager;
 import com.fabian.xsetwarps.managers.WarpManager;
 import com.fabian.xsetwarps.utils.ColorUtils;
+import com.fabian.xsetwarps.utils.ConfigUpdater;
 import com.fabian.xsetwarps.utils.TeleportEffects;
 import com.fabian.xsetwarps.utils.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class XSetWarps extends JavaPlugin {
 
@@ -53,6 +60,7 @@ public class XSetWarps extends JavaPlugin {
         // Load and update config
         saveDefaultConfig();
         updateConfig();
+        checkConfigCode();
 
         // Initialize Managers
         this.languageManager = new LanguageManager(this);
@@ -118,12 +126,12 @@ public class XSetWarps extends JavaPlugin {
         getServer().getConsoleSender().sendMessage(
                 ColorUtils.translateColors("&8[&bX-SetWarps&8] &7----------------------------------------------"));
 
-        if (getConfig().getBoolean("updates.check", true)) {
+        if (getConfig().getBoolean("check-updates", true)) {
             updateChecker.checkForUpdates();
         }
 
         // bStats Metrics
-        if (getConfig().getBoolean("metrics.enabled", true)) {
+        if (getConfig().getBoolean("metrics", true)) {
             int pluginId = 31698;
             Metrics metrics = new Metrics(this, pluginId);
             metrics.addCustomChart(new Metrics.SimplePie("language", () ->
@@ -173,13 +181,97 @@ public class XSetWarps extends JavaPlugin {
         return teleportEffects;
     }
 
+    /**
+     * Checks the config 'code' value. If the disk config code is older than
+     * the JAR default code, the disk config is backed up and rebuilt from the
+     * JAR resource so users always get the latest config structure.
+     */
+    private void checkConfigCode() {
+        File configFile = new File(getDataFolder(), "config.yml");
+        if (!configFile.exists()) return;
+
+        // Read code from JAR default
+        int jarCode = 0;
+        try {
+            YamlConfiguration jarDefaults = YamlConfiguration.loadConfiguration(
+                    new java.io.InputStreamReader(getResource("config.yml"), java.nio.charset.StandardCharsets.UTF_8));
+            jarCode = jarDefaults.getInt("code", 0);
+        } catch (Exception e) {
+            getLogger().warning("Could not read config code from JAR: " + e.getMessage());
+            return;
+        }
+
+        // Read code from disk
+        YamlConfiguration diskConfig = YamlConfiguration.loadConfiguration(configFile);
+        int diskCode = diskConfig.getInt("code", 0);
+
+        if (diskCode < jarCode) {
+            getLogger().info("Config code outdated (disk=" + diskCode + ", jar=" + jarCode + "). Rebuilding config...");
+
+            // Backup current config
+            File backupFile = new File(getDataFolder(), "config_old.yml");
+            try {
+                Files.copy(configFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                getLogger().info("Old config backed up to config_old.yml");
+            } catch (IOException e) {
+                getLogger().warning("Could not back up config: " + e.getMessage());
+            }
+
+            // Rebuild config: write JAR default to disk
+            try {
+                saveResource("config.yml", true);
+                reloadConfig();
+                getLogger().info("Config rebuilt successfully from JAR defaults (code=" + jarCode + ").");
+            } catch (Exception e) {
+                getLogger().severe("Failed to rebuild config: " + e.getMessage());
+            }
+        }
+    }
+
     private void updateConfig() {
         FileConfiguration config = getConfig();
         boolean changed = false;
 
-        // Migration mapping: Old Key -> New Key
+        // Migration: old nested metrics.enabled → flat metrics
+        if (config.contains("metrics.enabled")) {
+            if (!config.contains("metrics")) {
+                config.set("metrics", config.getBoolean("metrics.enabled", true));
+            }
+            config.set("metrics.enabled", null);
+            if (config.isConfigurationSection("metrics")) {
+                // If metrics section still has other keys, keep it; otherwise clean up
+                if (config.getConfigurationSection("metrics").getKeys(false).isEmpty()) {
+                    config.set("metrics", true);
+                }
+            }
+            changed = true;
+        }
+
+        // Migration: old nested updates.check → flat check-updates
+        if (config.contains("updates.check")) {
+            if (!config.contains("check-updates")) {
+                config.set("check-updates", config.getBoolean("updates.check", true));
+            }
+            config.set("updates.check", null);
+            changed = true;
+        }
+
+        // Migration: old nested updates.notify-on-join → (removed, now always notifies if check-updates is true)
+        if (config.contains("updates.notify-on-join")) {
+            config.set("updates.notify-on-join", null);
+            changed = true;
+        }
+
+        // Clean up empty updates section
+        if (config.isConfigurationSection("updates")) {
+            if (config.getConfigurationSection("updates").getKeys(false).isEmpty()) {
+                config.set("updates", null);
+                changed = true;
+            }
+        }
+
+        // Migration mapping: Old Flat Key -> New Hierarchical Key
         String[][] migrations = {
-                { "check-updates", "updates.check" },
                 { "help-message", "commands.help-message" },
                 { "max-warps", "warps.max-warps" },
                 { "per-warp-permission", "warps.per-warp-permission" },
@@ -213,7 +305,11 @@ public class XSetWarps extends JavaPlugin {
 
         if (changed) {
             saveConfig();
-            getLogger().info("Config.yml has been updated to the latest format (hierarchical).");
+            getLogger().info("Config.yml has been updated to the latest format.");
         }
+
+        // Run ConfigUpdater to add any missing keys from the JAR resource
+        ConfigUpdater.update(this, "config.yml", new File(getDataFolder(), "config.yml"));
+        reloadConfig();
     }
 }

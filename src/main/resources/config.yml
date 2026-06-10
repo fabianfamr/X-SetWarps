@@ -31,6 +31,18 @@ language: en
 prefix: "&8[&bX-SetWarps&8] &7"
 
 # ------------------------------------------------------------------------------
+# CHECK UPDATES
+# Checks the SpigotMC API for new versions on startup and notifies admins on join.
+# ------------------------------------------------------------------------------
+check-updates: true
+
+# ------------------------------------------------------------------------------
+# DEBUG
+# Enables additional logging for troubleshooting. Leave off unless asked by staff.
+# ------------------------------------------------------------------------------
+debug: false
+
+# ------------------------------------------------------------------------------
 # METRICS (bStats)
 # Sends anonymous usage statistics to bStats.org to help improve the plugin.
 # Data collected: server version, online players, plugin version, warp count,
@@ -38,18 +50,10 @@ prefix: "&8[&bX-SetWarps&8] &7"
 # NO personal data, server IP, or sensitive information is ever collected.
 # You can safely disable this without losing any plugin functionality.
 # ------------------------------------------------------------------------------
-metrics:
-  enabled: true
+metrics: true
 
-# ------------------------------------------------------------------------------
-# UPDATE CHECKER
-# Checks the SpigotMC API for new versions on startup.
-# ------------------------------------------------------------------------------
-updates:
-  # Check for updates when the server starts?
-  check: true
-  # Notify admins (players with xsetwarps.admin) on join if an update exists?
-  notify-on-join: true
+# DO NOT CHANGE THIS VALUE — used internally for config version tracking.
+code: 1
 
 # ------------------------------------------------------------------------------
 # COMMANDS
