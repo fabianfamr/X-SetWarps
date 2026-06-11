@@ -86,6 +86,13 @@ public class MainCommand implements CommandExecutor {
             case "setwarpcooldown":
                 handleSetWarpCooldown(sender, args);
                 break;
+            case "debug":
+                boolean dbg = plugin.getConfig().getBoolean("debug", false);
+                plugin.getConfig().set("debug", !dbg);
+                plugin.saveConfig();
+                sender.sendMessage(com.fabian.xsetwarps.utils.ColorUtils.translateColors(
+                        "&8[&bX-SetWarps&8] &7Debug mode: " + (!dbg ? "&aenabled" : "&cdisabled")));
+                break;
             default:
                 sendHelp(sender);
                 break;
