@@ -20,7 +20,7 @@ public class ConfigUpdater {
                 resConfig = YamlConfiguration.loadConfiguration(
                         new InputStreamReader(resourceStream, StandardCharsets.UTF_8));
             } catch (Exception e) {
-                plugin.getLogger().warning("Failed to update " + diskFile.getName() + ": " + e.getMessage());
+                plugin.logWarning("Failed to update " + diskFile.getName() + ": " + e.getMessage());
                 return;
             }
             if (resConfig == null) return;
@@ -30,7 +30,7 @@ public class ConfigUpdater {
                     StandardCharsets.UTF_8)) {
                 diskConfig.load(reader);
             } catch (Exception e) {
-                plugin.getLogger().warning("Failed to read disk config " + diskFile.getName() + ": " + e.getMessage()
+                plugin.logWarning("Failed to read disk config " + diskFile.getName() + ": " + e.getMessage()
                         + " — Skipping update to prevent data loss.");
                 return;
             }
@@ -48,7 +48,7 @@ public class ConfigUpdater {
                 updateHierarchicalFile(plugin, diskFile, diskConfig, resConfig);
             }
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to update " + diskFile.getName() + ": " + e.getMessage());
+            plugin.logWarning("Failed to update " + diskFile.getName() + ": " + e.getMessage());
         }
     }
 

@@ -32,7 +32,7 @@ public class CommandRegistrar {
     public void register(String name, CommandExecutor executor, TabCompleter tabCompleter, String... aliases) {
         CommandMap commandMap = getCommandMap();
         if (commandMap == null) {
-            plugin.getLogger().warning("Could not access CommandMap, skipping /" + name);
+            plugin.logWarning("Could not access CommandMap, skipping /" + name);
             return;
         }
 
@@ -62,7 +62,7 @@ public class CommandRegistrar {
             field.setAccessible(true);
             return (CommandMap) field.get(Bukkit.getServer());
         } catch (Exception e) {
-            plugin.getLogger().warning("Could not access CommandMap: " + e.getMessage());
+            plugin.logWarning("Could not access CommandMap: " + e.getMessage());
             return null;
         }
     }

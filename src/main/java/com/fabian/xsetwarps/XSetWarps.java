@@ -38,6 +38,10 @@ public class XSetWarps extends JavaPlugin {
         getLogger().info(message);
     }
 
+    public void logWarning(String message) {
+        getLogger().warning(message);
+    }
+
     public void logError(String message) {
         getLogger().severe(message);
     }
@@ -52,7 +56,7 @@ public class XSetWarps extends JavaPlugin {
     @Override
     public void onLoad() {
         DebugLogger.debug("Lifecycle", "onLoad() called");
-        getLogger().info("X-SetWarps Pre-Load Started...");
+        logInfo("X-SetWarps Pre-Load Started...");
         new DependencyManager(this).loadDependencies();
     }
 
@@ -209,7 +213,7 @@ public class XSetWarps extends JavaPlugin {
                     new java.io.InputStreamReader(getResource("config.yml"), java.nio.charset.StandardCharsets.UTF_8));
             jarCode = jarDefaults.getInt("code", 0);
         } catch (Exception e) {
-            getLogger().warning("Could not read config code from JAR: " + e.getMessage());
+            logWarning("Could not read config code from JAR: " + e.getMessage());
             return;
         }
 
@@ -219,24 +223,24 @@ public class XSetWarps extends JavaPlugin {
 
         if (diskCode < jarCode) {
             DebugLogger.debug("Config", "Config code outdated (disk=" + diskCode + ", jar=" + jarCode + "), rebuilding...");
-            getLogger().info("Config code outdated (disk=" + diskCode + ", jar=" + jarCode + "). Rebuilding config...");
+            logInfo("Config code outdated (disk=" + diskCode + ", jar=" + jarCode + "). Rebuilding config...");
 
             // Backup current config
             File backupFile = new File(getDataFolder(), "config_old.yml");
             try {
                 Files.copy(configFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                getLogger().info("Old config backed up to config_old.yml");
+                logInfo("Old config backed up to config_old.yml");
             } catch (IOException e) {
-                getLogger().warning("Could not back up config: " + e.getMessage());
+                logWarning("Could not back up config: " + e.getMessage());
             }
 
             // Rebuild config: write JAR default to disk
             try {
                 saveResource("config.yml", true);
                 reloadConfig();
-                getLogger().info("Config rebuilt successfully from JAR defaults (code=" + jarCode + ").");
+                logInfo("Config rebuilt successfully from JAR defaults (code=" + jarCode + ").");
             } catch (Exception e) {
-                getLogger().severe("Failed to rebuild config: " + e.getMessage());
+                logError("Failed to rebuild config: " + e.getMessage());
             }
         }
     }
@@ -320,7 +324,7 @@ public class XSetWarps extends JavaPlugin {
         if (changed) {
             saveConfig();
             DebugLogger.debug("Config", "Config migrations applied, saved to disk");
-            getLogger().info("Config.yml has been updated to the latest format.");
+            logInfo("Config.yml has been updated to the latest format.");
         } else {
             DebugLogger.debug("Config", "No config migrations needed");
         }

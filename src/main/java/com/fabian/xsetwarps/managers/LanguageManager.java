@@ -61,7 +61,7 @@ public class LanguageManager {
         // If the language file doesn't exist, fallback to English
         if (!messagesFile.exists()) {
             if (!lang.equalsIgnoreCase("en")) {
-                plugin.getLogger().warning("Language file " + lang + ".yml not found! Falling back to EN.");
+                plugin.logWarning("Language file " + lang + ".yml not found! Falling back to EN.");
                 lang = "en";
                 messagesFile = new File(messagesFolder, "en.yml");
                 if (!messagesFile.exists()) {

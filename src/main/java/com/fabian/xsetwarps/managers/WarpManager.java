@@ -112,7 +112,7 @@ public class WarpManager {
             }
             registeredPermissions.add(permission);
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to register permission: " + permission);
+            plugin.logWarning("Failed to register permission: " + permission);
         }
     }
 
@@ -574,7 +574,7 @@ public class WarpManager {
                     count++;
                 }
             } catch (NumberFormatException e) {
-                plugin.getLogger().warning("Skipping malformed warp entry: " + key);
+                plugin.logWarning("Skipping malformed warp entry: " + key);
             }
         }
 

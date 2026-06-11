@@ -60,7 +60,7 @@ public class TeleportEffects {
                 loc.getWorld().playSound(loc, fallback, soundVolume, soundPitch);
             } catch (Exception ex) {
                 DebugLogger.debug("TeleportEffects", "Failed to play teleport sound: " + soundName, ex);
-                plugin.getLogger().warning("Failed to play teleport sound: " + soundName);
+                plugin.logWarning("Failed to play teleport sound: " + soundName);
             }
         }
     }

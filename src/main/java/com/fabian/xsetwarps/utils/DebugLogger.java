@@ -11,7 +11,7 @@ import org.bukkit.Bukkit;
  */
 public final class DebugLogger {
 
-    private static final String PREFIX = "&8[&bX-SetWarps&8] &b[DEBUG] &7";
+    private static final String PREFIX = "&8[&bDEBUG&8]&r ";
 
     private DebugLogger() {
         // static utility – no instances
@@ -52,7 +52,7 @@ public final class DebugLogger {
     public static void debug(String category, String message) {
         if (isDebugEnabled()) {
             Bukkit.getConsoleSender().sendMessage(
-                    ColorUtils.translateColors(PREFIX + "&f[" + category + "&f] &7" + message));
+                    ColorUtils.translateColors(PREFIX + "&f[&f" + category + "&f]&r &7" + message));
         }
     }
 
@@ -66,7 +66,7 @@ public final class DebugLogger {
     public static void debug(String category, String message, Throwable throwable) {
         if (isDebugEnabled()) {
             Bukkit.getConsoleSender().sendMessage(
-                    ColorUtils.translateColors(PREFIX + "&f[" + category + "&f] &7" + message));
+                    ColorUtils.translateColors(PREFIX + "&f[&f" + category + "&f]&r &7" + message));
             throwable.printStackTrace();
         }
     }
