@@ -2,13 +2,14 @@ package com.fabian.xsetwarps;
 
 import com.fabian.xsetwarps.commands.*;
 import com.fabian.xsetwarps.managers.GUIManager;
-import com.fabian.xsetwarps.gui.GUIListener;
+import com.fabian.xsetwarps.listeners.GUIListener;
 import com.fabian.xsetwarps.listeners.PlayerJoinListener;
 import com.fabian.xsetwarps.hooks.PlaceholderHook;
 import com.fabian.xsetwarps.managers.DependencyManager;
 import com.fabian.xsetwarps.managers.CooldownManager;
 import com.fabian.xsetwarps.managers.LanguageManager;
 import com.fabian.xsetwarps.managers.WarpManager;
+import com.fabian.xsetwarps.metrics.Metrics;
 import com.fabian.xsetwarps.utils.ColorUtils;
 import com.fabian.xsetwarps.utils.CommandRegistrar;
 import com.fabian.xsetwarps.utils.ConfigUpdater;

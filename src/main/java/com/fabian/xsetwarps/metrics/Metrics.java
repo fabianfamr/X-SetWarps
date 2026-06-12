@@ -1,4 +1,4 @@
-package com.fabian.xsetwarps;
+package com.fabian.xsetwarps.metrics;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

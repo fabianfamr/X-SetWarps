@@ -1,6 +1,6 @@
 package com.fabian.xsetwarps.events;
 
-import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.models.Warp;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;

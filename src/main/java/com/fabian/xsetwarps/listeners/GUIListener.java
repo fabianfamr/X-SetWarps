@@ -1,10 +1,10 @@
-package com.fabian.xsetwarps.gui;
+package com.fabian.xsetwarps.listeners;
 
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.events.WarpTeleportEvent;
 import com.fabian.xsetwarps.managers.CooldownManager;
 import com.fabian.xsetwarps.managers.LanguageManager;
-import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.models.Warp;
 import com.fabian.xsetwarps.utils.SchedulerUtil;
 import com.fabian.xsetwarps.utils.DebugLogger;
 

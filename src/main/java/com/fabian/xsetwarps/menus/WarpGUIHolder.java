@@ -1,4 +1,4 @@
-package com.fabian.xsetwarps.gui;
+package com.fabian.xsetwarps.menus;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;

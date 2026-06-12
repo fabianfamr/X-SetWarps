@@ -2,7 +2,7 @@ package com.fabian.xsetwarps.commands;
 
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.managers.LanguageManager;
-import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.models.Warp;
 import com.fabian.xsetwarps.utils.DebugLogger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

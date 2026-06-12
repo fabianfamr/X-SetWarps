@@ -1,7 +1,7 @@
 package com.fabian.xsetwarps.hooks;
 
 import com.fabian.xsetwarps.XSetWarps;
-import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.models.Warp;
 import com.fabian.xsetwarps.utils.DebugLogger;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;

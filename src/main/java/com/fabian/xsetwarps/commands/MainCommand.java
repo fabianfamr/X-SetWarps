@@ -287,7 +287,7 @@ public class MainCommand implements CommandExecutor {
             }
         }
 
-        com.fabian.xsetwarps.model.Warp warp = plugin.getWarpManager().getWarp(warpName);
+        com.fabian.xsetwarps.models.Warp warp = plugin.getWarpManager().getWarp(warpName);
         if (warp == null) {
             sender.sendMessage(lang.getMessage(sender, "warp-not-found", "%warp%", warpName));
             return;

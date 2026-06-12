@@ -1,7 +1,7 @@
 package com.fabian.xsetwarps.managers;
 
 import com.fabian.xsetwarps.XSetWarps;
-import com.fabian.xsetwarps.model.Warp;
+import com.fabian.xsetwarps.models.Warp;
 import com.fabian.xsetwarps.utils.DebugLogger;
 
 import org.bukkit.Bukkit;

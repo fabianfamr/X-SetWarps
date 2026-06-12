@@ -1,4 +1,4 @@
-package com.fabian.xsetwarps.model;
+package com.fabian.xsetwarps.models;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
