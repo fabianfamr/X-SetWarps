@@ -1,18 +1,27 @@
-# ==============================================================================
-#  __  __      ____       _  __        __                
-#  \ \/ /     / ___|  ___| |_\ \      / /_ _ _ __ _ __  ___ 
-#   \  /_____ \___ \ / _ \ __|\ \ /\ / / _` | '__| '_ \/ __|
-#  /  \_____|____) |  __/ |_  \ V  V / (_| , |  | | |_) \__ \
-#  /_/\_\    |____/ \___|\__|  \_/\_/ \__,_|_|  | .__/|___/
-#                                                |_|         
-# ==============================================================================
-#  X-SetWarps v1.3 | Developed by Fabian (X Proyects)
-#  Discord: https://discord.gg/Yb6GsfGWmd
-#  SpigotMC: https://www.spigotmc.org/resources/x-setwarps/
-#  
-#  Supported server versions: 1.13 - 1.21+ (Paper, Spigot, Folia, Purpur)
-#  Compatibility library: XSeries (cross-version materials & sounds)
-# ==============================================================================
+#
+#  __  __   ____  _        _   _       _   _ ____   ____ _____
+# |  \/  | |  _ \| |      | | | |     | \ | |  _ \ / ___|_   _|
+# | |\/| | | | | | |      | |_| |     |  \| | |_) | |  _  | |
+# | |  | | | |_| | |___   |  _  |  _  | |\  |  __/| |_| | | |
+# |_|  |_| |____/|_____|  |_| |_| (_) |_| \_|_|_|    \____| |_|
+#
+# ======================================================== #
+#    X-SetWarps | Advanced Warp System Plugin for Minecraft    #
+#    Author: Fabian | Web: https://xproyects.qzz.io            #
+# ======================================================== #
+#
+# Features:
+#   - Create, delete and manage warps with permissions per warp
+#   - GUI menu for warp selection with customizable items
+#   - Per-warp and global cooldown system
+#   - Teleport delay with movement cancellation
+#   - Teleport effects (sounds, particles) on warp
+#   - Per-warp descriptions shown in GUI and /warpinfo
+#   - PlaceholderAPI expansion with warp-related placeholders
+#   - WorldEdit schematic support for 1.8.8
+#
+# Supported versions: 1.13 - 1.21+ (Paper, Spigot, Folia, Purpur)
+# Compatibility library: XSeries (cross-version materials & sounds)
 
 # ------------------------------------------------------------------------------
 # LANGUAGE
