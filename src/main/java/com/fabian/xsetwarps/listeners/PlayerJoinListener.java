@@ -23,7 +23,7 @@ public class PlayerJoinListener implements Listener {
         
         if (!player.hasPermission("xsetwarps.admin")) return;
 
-        if (plugin.getConfig().getBoolean("check-updates", true)) {
+        if (plugin.getConfig().getBoolean("updates.notify-on-join", true)) {
             if (plugin.getUpdateChecker().isUpdateAvailable()) {
                 DebugLogger.debug("PlayerJoinListener", "Notifying admin " + player.getName() + " about update");
                 LanguageManager lang = plugin.getLanguageManager();

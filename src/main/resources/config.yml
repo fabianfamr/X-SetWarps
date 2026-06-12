@@ -31,10 +31,14 @@ language: en
 prefix: "&8[&bX-SetWarps&8] &7"
 
 # ------------------------------------------------------------------------------
-# CHECK UPDATES
-# Checks the SpigotMC API for new versions on startup and notifies admins on join.
+# UPDATE CHECKER
+# Checks the SpigotMC API for new versions on startup.
 # ------------------------------------------------------------------------------
-check-updates: true
+updates:
+  # Check for updates when the server starts?
+  check: true
+  # Notify admins (players with xsetwarps.admin) on join if an update exists?
+  notify-on-join: true
 
 # ------------------------------------------------------------------------------
 # DEBUG

@@ -129,7 +129,7 @@ public class XSetWarps extends JavaPlugin {
         }
 
         // Check for updates
-        if (getConfig().getBoolean("check-updates", true)) {
+        if (getConfig().getBoolean("updates.check", true)) {
             DebugLogger.debug("Update", "Update checker enabled");
             this.updateChecker = new UpdateChecker(this);
             updateChecker.checkForUpdates();
@@ -274,27 +274,19 @@ public class XSetWarps extends JavaPlugin {
             changed = true;
         }
 
-        // Migration: old nested updates.check → flat check-updates
-        if (config.contains("updates.check")) {
-            if (!config.contains("check-updates")) {
-                config.set("check-updates", config.getBoolean("updates.check", true));
+        // Migration: old flat check-updates → nested updates.check
+        if (config.contains("check-updates")) {
+            if (!config.contains("updates.check")) {
+                config.set("updates.check", config.getBoolean("check-updates", true));
             }
-            config.set("updates.check", null);
+            config.set("check-updates", null);
             changed = true;
         }
 
-        // Migration: old nested updates.notify-on-join → (removed, now always notifies if check-updates is true)
-        if (config.contains("updates.notify-on-join")) {
-            config.set("updates.notify-on-join", null);
+        // Ensure updates.notify-on-join exists
+        if (!config.contains("updates.notify-on-join")) {
+            config.set("updates.notify-on-join", true);
             changed = true;
-        }
-
-        // Clean up empty updates section
-        if (config.isConfigurationSection("updates")) {
-            if (config.getConfigurationSection("updates").getKeys(false).isEmpty()) {
-                config.set("updates", null);
-                changed = true;
-            }
         }
 
         // Migration mapping: Old Flat Key -> New Hierarchical Key
