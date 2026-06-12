@@ -64,114 +64,122 @@ public class XSetWarps extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        DebugLogger.debug("Lifecycle", "onEnable() started");
 
-        // Load and update config
-        saveDefaultConfig();
-        DebugLogger.debug("Config", "Default config saved/loaded");
-        updateConfig();
-        checkConfigCode();
-
-        // Initialize Managers
-        DebugLogger.debug("Lifecycle", "Initializing managers...");
-        this.languageManager = new LanguageManager(this);
-        DebugLogger.debug("Lifecycle", "LanguageManager initialized");
-        this.warpManager = new WarpManager(this);
-        DebugLogger.debug("Lifecycle", "WarpManager initialized");
-        this.cooldownManager = new CooldownManager(this);
-        this.updateChecker = new UpdateChecker(this);
-        this.guiManager = new GUIManager(this);
-        this.teleportEffects = new TeleportEffects(this);
-        DebugLogger.debug("Lifecycle", "All managers initialized");
-
-        // Register Commands
-        DebugLogger.debug("Lifecycle", "Registering commands...");
-        CommandRegistrar registrar = new CommandRegistrar(this);
-        WarpTabCompleter tabCompleter = new WarpTabCompleter(this);
-
-        // Register the main command from plugin.yml
-        getCommand("xsetwarp").setExecutor(new MainCommand(this));
-        getCommand("xsetwarp").setTabCompleter(tabCompleter);
-
-        // Register sub-commands dynamically
-        registrar.register("setwarp", new SetWarpCommand(this), null);
-        registrar.register("warp", new WarpCommand(this), tabCompleter);
-        registrar.register("delwarp", new DelWarpCommand(this), tabCompleter);
-        registrar.register("warps", new WarpsCommand(this), null, "warpgui");
-        registrar.register("warpinfo", new WarpInfoCommand(this), tabCompleter);
-
-        DebugLogger.debug("Lifecycle", "All commands registered");
-
-        // Register Listeners
-        DebugLogger.debug("Lifecycle", "Registering listeners...");
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new GUIListener(this, guiManager), this);
-
-        // PlaceholderAPI soft hook
-        String papiStatus = "&cNot Found";
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            DebugLogger.debug("PAPI", "PlaceholderAPI found, registering hook...");
-            new PlaceholderHook(this).register();
-            papiStatus = "&aRegistered";
-            DebugLogger.debug("PAPI", "PlaceholderAPI hook registered successfully");
-        } else {
-            DebugLogger.debug("PAPI", "PlaceholderAPI not found, skipping hook");
+        try {
+            // Initialize config managers first
+            saveDefaultConfig();
+            DebugLogger.debug("Config", "Default config saved/loaded");
+            updateConfig();
+            checkConfigCode();
+            this.languageManager = new LanguageManager(this);
+            DebugLogger.debug("Config", "LanguageManager initialized");
+        } catch (Exception e) {
+            DebugLogger.debug("Config", "Failed to initialize config managers", e);
+            e.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
 
-        // Stylized startup message
-        String version = getDescription().getVersion();
-        String lang = getConfig().getString("language", "EN").toUpperCase();
+        // Load libraries (already loaded in onLoad, but DependencyManager is for runtime libs)
+        // Dependencies are loaded in onLoad() via DependencyManager
 
-        getServer().getConsoleSender()
-                .sendMessage(ColorUtils.translateColors("&8[&bX-SetWarps&8] &7Enabling X-SetWarps v" + version));
-        getServer().getConsoleSender()
-                .sendMessage(ColorUtils.translateColors("&8[&bX-SetWarps&8] &7Initializing storage backend: &fYAML"));
-        getServer().getConsoleSender()
-                .sendMessage(ColorUtils.translateColors("&8[&bX-SetWarps&8] &7Connecting to YAML database..."));
-        getServer().getConsoleSender()
-                .sendMessage(ColorUtils.translateColors("&8[&bX-SetWarps&8] &7YAML database connected and ready."));
+        // Initialize remaining managers
+        try {
+            DebugLogger.debug("Init", "Initializing remaining managers...");
+            this.warpManager = new WarpManager(this);
+            DebugLogger.debug("Init", "WarpManager initialized");
+            this.cooldownManager = new CooldownManager(this);
+            this.guiManager = new GUIManager(this);
+            this.teleportEffects = new TeleportEffects(this);
+            DebugLogger.debug("Init", "All managers initialized");
 
-        getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8] &7----------------------------------------------"));
-        getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8]   &aEnabled v" + version + "! Enjoy warping!"));
-        getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8]   &fStorage: &eYAML &7| &fLanguage: &e" + lang));
-        getServer().getConsoleSender()
-                .sendMessage(ColorUtils.translateColors("&8[&bX-SetWarps&8]   &fPlaceholderAPI: " + papiStatus));
-        getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8] &7----------------------------------------------"));
+            // Register Commands
+            DebugLogger.debug("Command", "Registering commands...");
+            CommandRegistrar registrar = new CommandRegistrar(this);
+            WarpTabCompleter tabCompleter = new WarpTabCompleter(this);
 
+            getCommand("xsetwarp").setExecutor(new MainCommand(this));
+            getCommand("xsetwarp").setTabCompleter(tabCompleter);
+
+            registrar.register("setwarp", new SetWarpCommand(this), null);
+            registrar.register("warp", new WarpCommand(this), tabCompleter);
+            registrar.register("delwarp", new DelWarpCommand(this), tabCompleter);
+            registrar.register("warps", new WarpsCommand(this), null, "warpgui");
+            registrar.register("warpinfo", new WarpInfoCommand(this), tabCompleter);
+            DebugLogger.debug("Command", "All commands registered");
+
+            // Register Listeners
+            Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+            Bukkit.getPluginManager().registerEvents(new GUIListener(this, guiManager), this);
+            DebugLogger.debug("Init", "Listeners registered");
+
+            // PlaceholderAPI Integration
+            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                DebugLogger.debug("PAPI", "PlaceholderAPI found, registering hook");
+                new PlaceholderHook(this).register();
+            } else {
+                DebugLogger.debug("PAPI", "PlaceholderAPI not found, skipping hook");
+            }
+
+        } catch (Exception e) {
+            DebugLogger.debug("Init", "Failed to initialize managers", e);
+            e.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        // Check for updates
         if (getConfig().getBoolean("check-updates", true)) {
+            DebugLogger.debug("Update", "Update checker enabled");
+            this.updateChecker = new UpdateChecker(this);
             updateChecker.checkForUpdates();
         }
 
-        // bStats Metrics
-        if (getConfig().getBoolean("metrics", true)) {
-            int pluginId = 31698;
-            Metrics metrics = new Metrics(this, pluginId);
-            metrics.addCustomChart(new Metrics.SimplePie("language", () ->
-                    getConfig().getString("language", "en")));
-            metrics.addCustomChart(new Metrics.SingleLineChart("warps_count", () ->
-                    warpManager.getTotalWarpCount()));
-            metrics.addCustomChart(new Metrics.SimplePie("gui_enabled", () ->
-                    getConfig().getBoolean("gui.enabled", true) ? "true" : "false"));
-            metrics.addCustomChart(new Metrics.SimplePie("per_warp_permission", () ->
-                    getConfig().getBoolean("warps.per-warp-permission", false) ? "true" : "false"));
-        }
+        // Initialize bStats Metrics
+        setupMetrics();
+
+        String version = getDescription().getVersion();
+        String lang = getConfig().getString("language", "EN").toUpperCase();
+
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8]   &aEnabled v" + version + "! Enjoy warping!"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8]   &fStorage: &eYAML &7| &fLanguage: &e" + lang));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8] &7----------------------------------------------"));
     }
 
     @Override
     public void onDisable() {
-        DebugLogger.debug("Lifecycle", "onDisable() called");
-        String version = getDescription().getVersion();
+        DebugLogger.debug("Init", "Plugin disabling...");
 
-        getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8] &7----------------------------------------------"));
-        getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8]   &cDisabled v" + version + "! Goodbye."));
-        getServer().getConsoleSender().sendMessage(
-                ColorUtils.translateColors("&8[&bX-SetWarps&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8]   &cDisabled v" + getDescription().getVersion() + "! Out."));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8] &7----------------------------------------------"));
+    }
+
+    private void setupMetrics() {
+        if (getConfig().getBoolean("metrics", true)) {
+            try {
+                int pluginId = 31698;
+                Metrics metrics = new Metrics(this, pluginId);
+                metrics.addCustomChart(new Metrics.SimplePie("language", () ->
+                        getConfig().getString("language", "en")));
+                metrics.addCustomChart(new Metrics.SingleLineChart("warps_count", () ->
+                        warpManager.getTotalWarpCount()));
+                metrics.addCustomChart(new Metrics.SimplePie("gui_enabled", () ->
+                        getConfig().getBoolean("gui.enabled", true) ? "true" : "false"));
+                metrics.addCustomChart(new Metrics.SimplePie("per_warp_permission", () ->
+                        getConfig().getBoolean("warps.per-warp-permission", false) ? "true" : "false"));
+            } catch (Exception e) {
+                logWarning("Could not start bStats Metrics: " + e.getMessage());
+            }
+        }
     }
 
     public WarpManager getWarpManager() {
