@@ -1,7 +1,7 @@
 package com.fabian.xsetwarps;
 
 import com.fabian.xsetwarps.commands.*;
-import com.fabian.xsetwarps.gui.GUIManager;
+import com.fabian.xsetwarps.managers.GUIManager;
 import com.fabian.xsetwarps.gui.GUIListener;
 import com.fabian.xsetwarps.listeners.PlayerJoinListener;
 import com.fabian.xsetwarps.hooks.PlaceholderHook;

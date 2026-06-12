@@ -1,6 +1,7 @@
-package com.fabian.xsetwarps.gui;
+package com.fabian.xsetwarps.managers;
 
 import com.fabian.xsetwarps.XSetWarps;
+import com.fabian.xsetwarps.gui.WarpGUIHolder;
 import com.fabian.xsetwarps.model.Warp;
 import com.fabian.xsetwarps.utils.ColorUtils;
 import com.fabian.xsetwarps.utils.DebugLogger;
