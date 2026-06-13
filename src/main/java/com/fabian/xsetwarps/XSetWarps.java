@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 public class XSetWarps extends JavaPlugin {
 
@@ -53,6 +54,7 @@ public class XSetWarps extends JavaPlugin {
     private UpdateChecker updateChecker;
     private GUIManager guiManager;
     private TeleportEffects teleportEffects;
+    public UUID debugPlayer; // player who enabled debug via command (null = console-only via config)
 
     @Override
     public void onLoad() {

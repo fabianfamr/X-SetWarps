@@ -49,7 +49,14 @@ public class CommandRegistrar {
         Command existing = commandMap.getCommand(name.toLowerCase());
         if (existing != null) {
             existing.unregister(commandMap);
-            commandMap.getKnownCommands().remove(name.toLowerCase());
+            try {
+                java.lang.reflect.Method getKnownCommands = commandMap.getClass().getMethod("getKnownCommands");
+                @SuppressWarnings("unchecked")
+                java.util.Map<String, Command> knownCommands = (java.util.Map<String, Command>) getKnownCommands.invoke(commandMap);
+                knownCommands.remove(name.toLowerCase());
+            } catch (Exception ignored) {
+                // Fallback: may not fully unregister on all server versions
+            }
         }
 
         commandMap.register(plugin.getName().toLowerCase(), cmd);

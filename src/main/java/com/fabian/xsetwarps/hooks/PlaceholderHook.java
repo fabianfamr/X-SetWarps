@@ -75,3 +75,4 @@ public class PlaceholderHook extends PlaceholderExpansion {
         DebugLogger.debug("PlaceholderHook", "Unresolved placeholder: " + params);
         return null;
     }
+}

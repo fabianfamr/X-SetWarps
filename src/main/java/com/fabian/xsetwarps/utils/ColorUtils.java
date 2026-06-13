@@ -151,11 +151,14 @@ public class ColorUtils {
      * On Paper: native Adventure. On Spigot: fallback to legacy string.
      */
     public static void sendComponent(CommandSender sender, Component component) {
-        try {
-            sender.sendMessage(component);
-            return;
-        } catch (NoSuchMethodError | NoClassDefFoundError e) {
-            // Fall back to legacy for Spigot
+        if (paperAdventureAvailable) {
+            try {
+                java.lang.reflect.Method sendMessageMethod = sender.getClass().getMethod("sendMessage", Component.class);
+                sendMessageMethod.invoke(sender, component);
+                return;
+            } catch (Exception ignored) {
+                // Fall back to legacy for Spigot
+            }
         }
         sender.sendMessage(toLegacyString(component));
     }

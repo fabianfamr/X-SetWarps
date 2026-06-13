@@ -6,6 +6,7 @@ import com.fabian.xsetwarps.utils.DebugLogger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
@@ -87,11 +88,24 @@ public class MainCommand implements CommandExecutor {
                 handleSetWarpCooldown(sender, args);
                 break;
             case "debug":
-                boolean dbg = plugin.getConfig().getBoolean("debug", false);
-                plugin.getConfig().set("debug", !dbg);
-                plugin.saveConfig();
-                sender.sendMessage(com.fabian.xsetwarps.utils.ColorUtils.translateColors(
-                        "&8[&bX-SetWarps&8] &7Debug mode: " + (!dbg ? "&aenabled" : "&cdisabled")));
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    if (plugin.debugPlayer != null && plugin.debugPlayer.equals(player.getUniqueId())) {
+                        plugin.debugPlayer = null;
+                        player.sendMessage(com.fabian.xsetwarps.utils.ColorUtils.translateColors(
+                                plugin.getConfig().getString("prefix", "&8[&bX-SetWarps&8]&r ") + "&7Debug mode: &cdisabled"));
+                    } else {
+                        plugin.debugPlayer = player.getUniqueId();
+                        player.sendMessage(com.fabian.xsetwarps.utils.ColorUtils.translateColors(
+                                plugin.getConfig().getString("prefix", "&8[&bX-SetWarps&8]&r ") + "&7Debug mode: &aenabled &7(messages sent to you)"));
+                    }
+                } else {
+                    boolean dbg = plugin.getConfig().getBoolean("debug", false);
+                    plugin.getConfig().set("debug", !dbg);
+                    plugin.saveConfig();
+                    sender.sendMessage(com.fabian.xsetwarps.utils.ColorUtils.translateColors(
+                            plugin.getConfig().getString("prefix", "&8[&bX-SetWarps&8]&r ") + "&7Debug mode: " + (!dbg ? "&aenabled &7(console)" : "&cdisabled")));
+                }
                 break;
             default:
                 sendHelp(sender);
