@@ -59,7 +59,7 @@ public class XSetWarps extends JavaPlugin {
     @Override
     public void onLoad() {
         DebugLogger.debug("Lifecycle", "onLoad() called");
-        logInfo("X-SetWarps Pre-Load Started...");
+        logInfo("&bX-SetWarps &fPre-Load &aStarted&f...");
         new DependencyManager(this).loadDependencies();
     }
 
@@ -234,13 +234,13 @@ public class XSetWarps extends JavaPlugin {
 
         if (diskCode < jarCode) {
             DebugLogger.debug("Config", "Config code outdated (disk=" + diskCode + ", jar=" + jarCode + "), rebuilding...");
-            logInfo("Config code outdated (disk=" + diskCode + ", jar=" + jarCode + "). Rebuilding config...");
+            logInfo("&eConfig code outdated &f(disk=&f" + diskCode + "&f, jar=&f" + jarCode + "&f)&e. Rebuilding config...");
 
             // Backup current config
             File backupFile = new File(getDataFolder(), "config_old.yml");
             try {
                 Files.copy(configFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                logInfo("Old config backed up to config_old.yml");
+                logInfo("&eOld config backed up to &fconfig_old.yml");
             } catch (IOException e) {
                 logWarning("Could not back up config: " + e.getMessage());
             }
@@ -249,7 +249,7 @@ public class XSetWarps extends JavaPlugin {
             try {
                 saveResource("config.yml", true);
                 reloadConfig();
-                logInfo("Config rebuilt successfully from JAR defaults (code=" + jarCode + ").");
+                logInfo("&aConfig rebuilt successfully from JAR defaults &f(code=&f" + jarCode + "&f)&a.");
             } catch (Exception e) {
                 logError("Failed to rebuild config: " + e.getMessage());
             }
@@ -327,7 +327,7 @@ public class XSetWarps extends JavaPlugin {
         if (changed) {
             saveConfig();
             DebugLogger.debug("Config", "Config migrations applied, saved to disk");
-            logInfo("Config.yml has been updated to the latest format.");
+            logInfo("&aConfig.yml has been updated to the latest format.");
         } else {
             DebugLogger.debug("Config", "No config migrations needed");
         }
