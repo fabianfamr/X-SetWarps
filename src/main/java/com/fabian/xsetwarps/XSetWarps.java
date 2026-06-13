@@ -113,6 +113,21 @@ public class XSetWarps extends JavaPlugin {
             // Register Listeners
             Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
             Bukkit.getPluginManager().registerEvents(new GUIListener(this, guiManager), this);
+
+            // Hide own namespaced commands from tab-completion (1.13+)
+            try {
+                Class<?> eventClass = Class.forName("org.bukkit.event.player.PlayerCommandSendEvent");
+                org.bukkit.event.HandlerList handlers = (org.bukkit.event.HandlerList) eventClass
+                        .getMethod("getHandlerList").invoke(null);
+                com.fabian.xsetwarps.listeners.CommandHideListener listener = new com.fabian.xsetwarps.listeners.CommandHideListener();
+                handlers.register(new org.bukkit.plugin.RegisteredListener(listener, (l, event) -> {
+                    if (eventClass.isInstance(event)) {
+                        listener.onCommandSend(event);
+                    }
+                }, org.bukkit.event.EventPriority.NORMAL, this, false));
+                DebugLogger.debug("Init", "CommandHideListener registered (reflection)");
+            } catch (Exception ignored) {}
+
             DebugLogger.debug("Init", "Listeners registered");
 
             // PlaceholderAPI Integration
