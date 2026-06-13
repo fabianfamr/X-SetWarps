@@ -92,11 +92,13 @@ public class MainCommand implements CommandExecutor {
                     Player player = (Player) sender;
                     if (plugin.debugPlayer != null && plugin.debugPlayer.equals(player.getUniqueId())) {
                         plugin.debugPlayer = null;
-                        player.sendMessage(com.fabian.xsetwarps.utils.ColorUtils.translateColors(
+                        com.fabian.xsetwarps.utils.ColorUtils.sendComponent(player,
+                                com.fabian.xsetwarps.utils.ColorUtils.format(player,
                                 plugin.getConfig().getString("prefix", "&8[&bX-SetWarps&8]&r ") + "&7Debug mode: &cdisabled"));
                     } else {
                         plugin.debugPlayer = player.getUniqueId();
-                        player.sendMessage(com.fabian.xsetwarps.utils.ColorUtils.translateColors(
+                        com.fabian.xsetwarps.utils.ColorUtils.sendComponent(player,
+                                com.fabian.xsetwarps.utils.ColorUtils.format(player,
                                 plugin.getConfig().getString("prefix", "&8[&bX-SetWarps&8]&r ") + "&7Debug mode: &aenabled &7(messages sent to you)"));
                     }
                 } else {
