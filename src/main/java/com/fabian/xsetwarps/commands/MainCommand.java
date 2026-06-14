@@ -2,6 +2,7 @@ package com.fabian.xsetwarps.commands;
 
 import com.fabian.xsetwarps.XSetWarps;
 import com.fabian.xsetwarps.managers.LanguageManager;
+import com.fabian.xsetwarps.utils.ColorUtils;
 import com.fabian.xsetwarps.utils.DebugLogger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -29,7 +30,7 @@ public class MainCommand implements CommandExecutor {
 
         if (args.length == 0) {
             if (!sender.hasPermission("xsetwarps.admin")) {
-                sender.sendMessage(lang.getMessage("no-permission"));
+                ColorUtils.send(sender, lang.getMessage("no-permission"));
                 return true;
             }
             sendHelp(sender);
@@ -42,14 +43,14 @@ public class MainCommand implements CommandExecutor {
         switch (subCommand) {
             case "export":
                 if (!sender.hasPermission("xsetwarps.admin") && !sender.hasPermission("xsetwarps.export")) {
-                    sender.sendMessage(lang.getMessage("no-permission"));
+                    ColorUtils.send(sender, lang.getMessage("no-permission"));
                     return true;
                 }
                 handleExportCommand(sender, args);
                 return true;
             case "import":
                 if (!sender.hasPermission("xsetwarps.admin") && !sender.hasPermission("xsetwarps.import")) {
-                    sender.sendMessage(lang.getMessage("no-permission"));
+                    ColorUtils.send(sender, lang.getMessage("no-permission"));
                     return true;
                 }
                 handleImportCommand(sender, args);
@@ -60,7 +61,7 @@ public class MainCommand implements CommandExecutor {
 
         // All other subcommands require xsetwarps.admin
         if (!sender.hasPermission("xsetwarps.admin")) {
-            sender.sendMessage(lang.getMessage("no-permission"));
+            ColorUtils.send(sender, lang.getMessage("no-permission"));
             return true;
         }
 
@@ -72,20 +73,27 @@ public class MainCommand implements CommandExecutor {
                 plugin.getLanguageManager().loadLanguage();
                 plugin.getGuiManager().reload();
                 plugin.getTeleportEffects().loadSettings();
-                sender.sendMessage(lang.getMessage("reload-success"));
+                ColorUtils.send(sender, lang.getMessage("reload-success"));
                 DebugLogger.debug("MainCommand", "Reload complete");
                 break;
             case "update":
                 plugin.getUpdateChecker().checkForUpdates(sender);
                 break;
             case "version":
-                sender.sendMessage(lang.getMessage("version-info", "%version%", plugin.getDescription().getVersion()));
+                ColorUtils.send(sender, lang.getMessage("version-info", "%version%", plugin.getDescription().getVersion()));
                 break;
             case "locate":
                 handleLocateCommand(sender, args);
                 break;
             case "setwarpcooldown":
                 handleSetWarpCooldown(sender, args);
+                break;
+            case "forcemessages":
+                if (!sender.hasPermission("xsetwarps.admin.forcemessages")) {
+                    ColorUtils.send(sender, lang.getMessage("no-permission"));
+                    return true;
+                }
+                handleForceMessagesCommand(sender, args);
                 break;
             case "debug":
                 if (sender instanceof Player) {
@@ -105,7 +113,7 @@ public class MainCommand implements CommandExecutor {
                     boolean dbg = plugin.getConfig().getBoolean("debug", false);
                     plugin.getConfig().set("debug", !dbg);
                     plugin.saveConfig();
-                    sender.sendMessage(com.fabian.xsetwarps.utils.ColorUtils.translateColors(
+                    ColorUtils.send(sender, com.fabian.xsetwarps.utils.ColorUtils.translateColors(
                             plugin.getConfig().getString("prefix", "&8[&bX-SetWarps&8]&r ") + "&7Debug mode: " + (!dbg ? "&aenabled &7(console)" : "&cdisabled")));
                 }
                 break;
@@ -123,8 +131,8 @@ public class MainCommand implements CommandExecutor {
         if (args.length < 2) {
             String current = plugin.getLanguageManager().getCurrentLanguage().toLowerCase();
             List<String> available = plugin.getLanguageManager().getAvailableLanguages();
-            sender.sendMessage(lang.getMessage("language-changed", "%language%", current));
-            sender.sendMessage(lang.getMessage("language-list", "%list%", String.join(", ", available)));
+            ColorUtils.send(sender, lang.getMessage("language-changed", "%language%", current));
+            ColorUtils.send(sender, lang.getMessage("language-list", "%list%", String.join(", ", available)));
             return;
         }
 
@@ -133,35 +141,36 @@ public class MainCommand implements CommandExecutor {
 
         if (success) {
             String current = plugin.getLanguageManager().getCurrentLanguage().toLowerCase();
-            sender.sendMessage(lang.getMessage("language-changed", "%language%", current));
+            ColorUtils.send(sender, lang.getMessage("language-changed", "%language%", current));
         } else {
             List<String> available = plugin.getLanguageManager().getAvailableLanguages();
-            sender.sendMessage(lang.getMessage("language-not-found", "%list%", String.join(", ", available)));
+            ColorUtils.send(sender, lang.getMessage("language-not-found", "%list%", String.join(", ", available)));
         }
     }
 
     private void sendHelp(CommandSender sender) {
         LanguageManager lang = plugin.getLanguageManager();
-        sender.sendMessage(lang.getMessage("help-header"));
-        sender.sendMessage(lang.getMessage("help-reload"));
-        sender.sendMessage(lang.getMessage("help-update"));
-        sender.sendMessage(lang.getMessage("help-version"));
-        sender.sendMessage(lang.getMessage("help-locate"));
-        sender.sendMessage(lang.getMessage("help-export"));
-        sender.sendMessage(lang.getMessage("help-import"));
-        sender.sendMessage(lang.getMessage("help-setwarpcooldown"));
-        sender.sendMessage(lang.getMessage("help-setwarp"));
-        sender.sendMessage(lang.getMessage("help-warp"));
-        sender.sendMessage(lang.getMessage("help-delwarp"));
-        sender.sendMessage(lang.getMessage("help-warps"));
-        sender.sendMessage(lang.getMessage("help-warpinfo"));
+        ColorUtils.send(sender, lang.getMessage("help-header"));
+        ColorUtils.send(sender, lang.getMessage("help-reload"));
+        ColorUtils.send(sender, lang.getMessage("help-update"));
+        ColorUtils.send(sender, lang.getMessage("help-version"));
+        ColorUtils.send(sender, lang.getMessage("help-locate"));
+        ColorUtils.send(sender, lang.getMessage("help-export"));
+        ColorUtils.send(sender, lang.getMessage("help-import"));
+        ColorUtils.send(sender, lang.getMessage("help-setwarpcooldown"));
+        ColorUtils.send(sender, lang.getMessage("help-forcemessages"));
+        ColorUtils.send(sender, lang.getMessage("help-setwarp"));
+        ColorUtils.send(sender, lang.getMessage("help-warp"));
+        ColorUtils.send(sender, lang.getMessage("help-delwarp"));
+        ColorUtils.send(sender, lang.getMessage("help-warps"));
+        ColorUtils.send(sender, lang.getMessage("help-warpinfo"));
     }
 
     private void handleExportCommand(CommandSender sender, String[] args) {
         LanguageManager lang = plugin.getLanguageManager();
 
         if (args.length < 2) {
-            sender.sendMessage(lang.getMessage(sender, "usage-export"));
+            ColorUtils.send(sender, lang.getMessage(sender, "usage-export"));
             return;
         }
 
@@ -170,9 +179,9 @@ public class MainCommand implements CommandExecutor {
 
         int count = plugin.getWarpManager().exportWarps(identifier, fileName);
         if (count >= 0) {
-            sender.sendMessage(lang.getMessage(sender, "export-success", "%count%", String.valueOf(count), "%file%", fileName + ".yml"));
+            ColorUtils.send(sender, lang.getMessage(sender, "export-success", "%count%", String.valueOf(count), "%file%", fileName + ".yml"));
         } else {
-            sender.sendMessage(lang.getMessage(sender, "export-failed"));
+            ColorUtils.send(sender, lang.getMessage(sender, "export-failed"));
         }
     }
 
@@ -188,7 +197,7 @@ public class MainCommand implements CommandExecutor {
         LanguageManager lang = plugin.getLanguageManager();
 
         if (args.length < 2) {
-            sender.sendMessage(lang.getMessage(sender, "usage-import"));
+            ColorUtils.send(sender, lang.getMessage(sender, "usage-import"));
             return;
         }
 
@@ -209,10 +218,10 @@ public class MainCommand implements CommandExecutor {
                 // Import from a YAML file (exports/ or warps/)
                 int count = plugin.getWarpManager().importWarps(target);
                 if (count >= 0) {
-                    sender.sendMessage(lang.getMessage(sender, "import-success", "%count%", String.valueOf(count)));
+                    ColorUtils.send(sender, lang.getMessage(sender, "import-success", "%count%", String.valueOf(count)));
                     plugin.getWarpManager().loadAllWarps();
                 } else if (count == -1) {
-                    sender.sendMessage(lang.getMessage(sender, "import-file-not-found", "%file%", target));
+                    ColorUtils.send(sender, lang.getMessage(sender, "import-file-not-found", "%file%", target));
                 }
                 break;
         }
@@ -234,13 +243,13 @@ public class MainCommand implements CommandExecutor {
         }
 
         if (count >= 0) {
-            sender.sendMessage(lang.getMessage(sender, "import-plugin-success",
+            ColorUtils.send(sender, lang.getMessage(sender, "import-plugin-success",
                     "%plugin%", displayName, "%count%", String.valueOf(count)));
             plugin.getWarpManager().loadAllWarps();
         } else if (count == -2) {
-            sender.sendMessage(lang.getMessage(sender, "import-plugin-not-found", "%plugin%", displayName));
+            ColorUtils.send(sender, lang.getMessage(sender, "import-plugin-not-found", "%plugin%", displayName));
         } else {
-            sender.sendMessage(lang.getMessage(sender, "import-file-not-found",
+            ColorUtils.send(sender, lang.getMessage(sender, "import-file-not-found",
                     "%file%", displayName + "/warps.yml"));
         }
     }
@@ -253,7 +262,7 @@ public class MainCommand implements CommandExecutor {
 
         Map<String, Integer> results = plugin.getWarpManager().importFromAllPlugins();
         if (results.isEmpty()) {
-            sender.sendMessage(lang.getMessage(sender, "import-all-no-plugins"));
+            ColorUtils.send(sender, lang.getMessage(sender, "import-all-no-plugins"));
             return;
         }
 
@@ -261,26 +270,108 @@ public class MainCommand implements CommandExecutor {
         for (Map.Entry<String, Integer> entry : results.entrySet()) {
             int count = entry.getValue();
             if (count >= 0) {
-                sender.sendMessage(lang.getMessage(sender, "import-all-result",
+                ColorUtils.send(sender, lang.getMessage(sender, "import-all-result",
                         "%plugin%", entry.getKey(), "%count%", String.valueOf(count)));
                 total += count;
             } else if (count == -1) {
-                sender.sendMessage(lang.getMessage(sender, "import-file-not-found",
+                ColorUtils.send(sender, lang.getMessage(sender, "import-file-not-found",
                         "%file%", entry.getKey() + "/warps.yml"));
             }
         }
 
         if (total > 0) {
             plugin.getWarpManager().loadAllWarps();
-            sender.sendMessage(lang.getMessage(sender, "import-success", "%count%", String.valueOf(total)));
+            ColorUtils.send(sender, lang.getMessage(sender, "import-success", "%count%", String.valueOf(total)));
         }
+    }
+
+    /**
+     * Handles /xsw forcemessages [new|keep] [all|language]
+     *
+     * Modes:
+     *   new  - Regenerates files from JAR defaults (overwrites customizations)
+     *   keep - Adds missing keys only, preserves existing values
+     */
+    private void handleForceMessagesCommand(CommandSender sender, String[] args) {
+        LanguageManager lang = plugin.getLanguageManager();
+
+        // /xsw forcemessages  ->  show current language + usage
+        if (args.length == 1) {
+            String current = lang.getCurrentLanguage().toLowerCase();
+            List<String> available = lang.getAvailableLanguages();
+            ColorUtils.send(sender, lang.getMessage("force-messages-current", "%lang%", current));
+            ColorUtils.send(sender, lang.getMessage("language-list", "%list%", String.join(", ", available)));
+            ColorUtils.send(sender, lang.getMessage("force-messages-usage"));
+            return;
+        }
+
+        String mode = args[1].toLowerCase();
+
+        // /xsw forcemessages <mode> (no target) -> show usage
+        if (args.length == 2) {
+            ColorUtils.send(sender, lang.getMessage("force-messages-usage"));
+            return;
+        }
+
+        String target = args[2].toLowerCase();
+        List<String> available = lang.getAvailableLanguages();
+
+        // Convert available to lowercase for comparison
+        List<String> availableLower = new java.util.ArrayList<>();
+        for (String l : available) {
+            availableLower.add(l.toLowerCase());
+        }
+
+        // ---- NEW mode (overwrite from JAR) ----
+        if (mode.equals("new")) {
+            if (target.equals("all")) {
+                int count = lang.forceResetAllMessages();
+                ColorUtils.send(sender, lang.getMessage("force-messages-reset-all", "%count%", String.valueOf(count)));
+            } else {
+                if (!availableLower.contains(target)) {
+                    ColorUtils.send(sender, lang.getMessage("language-not-found", "%list%", String.join(", ", available)));
+                    return;
+                }
+                boolean updated = lang.forceResetMessages(target);
+                if (updated) {
+                    ColorUtils.send(sender, lang.getMessage("force-messages-reset-success", "%file%", target));
+                } else {
+                    ColorUtils.send(sender, lang.getMessage("force-messages-reset-no-active", "%file%", target));
+                }
+            }
+            return;
+        }
+
+        // ---- KEEP mode (add missing keys only) ----
+        if (mode.equals("keep")) {
+            if (target.equals("all")) {
+                int count = lang.forceReloadAllMessages();
+                ColorUtils.send(sender, lang.getMessage("force-messages-all", "%count%", String.valueOf(count)));
+            } else {
+                if (!availableLower.contains(target)) {
+                    ColorUtils.send(sender, lang.getMessage("language-not-found", "%list%", String.join(", ", available)));
+                    return;
+                }
+                boolean updated = lang.forceReloadMessages(target);
+                if (updated) {
+                    ColorUtils.send(sender, lang.getMessage("force-messages-success", "%file%", target));
+                } else {
+                    ColorUtils.send(sender, lang.getMessage("force-messages-no-changes", "%file%", target));
+                }
+            }
+            return;
+        }
+
+        // Invalid mode
+        ColorUtils.send(sender, lang.getMessage("force-messages-invalid-mode"));
+        ColorUtils.send(sender, lang.getMessage("force-messages-usage"));
     }
 
     private void handleSetWarpCooldown(CommandSender sender, String[] args) {
         LanguageManager lang = plugin.getLanguageManager();
 
         if (args.length < 3) {
-            sender.sendMessage(lang.getMessage(sender, "usage-setwarpcooldown"));
+            ColorUtils.send(sender, lang.getMessage(sender, "usage-setwarpcooldown"));
             return;
         }
 
@@ -294,18 +385,18 @@ public class MainCommand implements CommandExecutor {
             try {
                 cooldown = Integer.parseInt(cooldownStr);
                 if (cooldown < -1) {
-                    sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-invalid"));
+                    ColorUtils.send(sender, lang.getMessage(sender, "setwarpcooldown-invalid"));
                     return;
                 }
             } catch (NumberFormatException e) {
-                sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-invalid"));
+                ColorUtils.send(sender, lang.getMessage(sender, "setwarpcooldown-invalid"));
                 return;
             }
         }
 
         com.fabian.xsetwarps.models.Warp warp = plugin.getWarpManager().getWarp(warpName);
         if (warp == null) {
-            sender.sendMessage(lang.getMessage(sender, "warp-not-found", "%warp%", warpName));
+            ColorUtils.send(sender, lang.getMessage(sender, "warp-not-found", "%warp%", warpName));
             return;
         }
 
@@ -314,9 +405,9 @@ public class MainCommand implements CommandExecutor {
         plugin.getWarpManager().saveWarp(warp);
 
         if (cooldown == -1) {
-            sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-reset", "%warp%", warp.getName()));
+            ColorUtils.send(sender, lang.getMessage(sender, "setwarpcooldown-reset", "%warp%", warp.getName()));
         } else {
-            sender.sendMessage(lang.getMessage(sender, "setwarpcooldown-set", "%warp%", warp.getName(), "%seconds%", String.valueOf(cooldown)));
+            ColorUtils.send(sender, lang.getMessage(sender, "setwarpcooldown-set", "%warp%", warp.getName(), "%seconds%", String.valueOf(cooldown)));
         }
     }
 }

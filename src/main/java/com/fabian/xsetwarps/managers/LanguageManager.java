@@ -11,8 +11,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +73,7 @@ public class LanguageManager {
             }
         }
 
-        this.messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+        this.messagesConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(messagesFile), StandardCharsets.UTF_8));
         this.currentLang = lang.toUpperCase();
         DebugLogger.debug("LanguageManager", "Loaded language file: " + lang + ".yml");
 
@@ -172,5 +175,123 @@ public class LanguageManager {
             return PlaceholderAPI.setPlaceholders(player, message);
         }
         return message;
+    }
+
+    /**
+     * Extracts a resource from the JAR and overwrites the destination file.
+     * Used by force-reset to guarantee a fresh copy regardless of disk state.
+     */
+    private void extractResource(String resourcePath, File destination) {
+        try (InputStream in = plugin.getResource(resourcePath);
+             OutputStream out = new FileOutputStream(destination)) {
+            if (in == null) {
+                plugin.logWarning("Resource not found in JAR: " + resourcePath);
+                return;
+            }
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        } catch (Exception e) {
+            plugin.logWarning("Could not extract resource: " + resourcePath + " - " + e.getMessage());
+        }
+    }
+
+    /**
+     * Force-updates a specific language file from JAR defaults (adds missing keys),
+     * then reloads into memory if it is the currently active language.
+     *
+     * @param langCode language code (e.g. "en", "es")
+     * @return true if the active language was reloaded
+     */
+    public boolean forceReloadMessages(String langCode) {
+        String fileName = langCode.endsWith(".yml") ? langCode : langCode + ".yml";
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        File diskFile = new File(messagesFolder, fileName);
+
+        if (!diskFile.exists()) {
+            try {
+                plugin.saveResource("messages/" + fileName, false);
+            } catch (Exception ignored) {
+            }
+        }
+
+        com.fabian.xsetwarps.utils.ConfigUpdater.update(plugin, "messages/" + fileName, diskFile);
+
+        if (currentLang.equalsIgnoreCase(langCode)) {
+            loadLanguage();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Force-updates ALL language files found on disk (adds missing keys),
+     * then reloads the active language into memory.
+     *
+     * @return the number of language files that were processed
+     */
+    public int forceReloadAllMessages() {
+        List<String> available = getAvailableLanguages();
+        for (String lang : available) {
+            String fileName = lang.endsWith(".yml") ? lang : lang + ".yml";
+            File messagesFolder = new File(plugin.getDataFolder(), "messages");
+            File diskFile = new File(messagesFolder, fileName);
+
+            if (diskFile.exists()) {
+                com.fabian.xsetwarps.utils.ConfigUpdater.update(plugin, "messages/" + fileName, diskFile);
+            } else {
+                try {
+                    plugin.saveResource("messages/" + fileName, false);
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        loadLanguage();
+        return available.size();
+    }
+
+    /**
+     * Force-reset (overwrite) a specific language file from JAR defaults,
+     * then reloads into memory if it is the currently active language.
+     *
+     * @param langCode language code (e.g. "en", "es")
+     * @return true if the active language was reloaded
+     */
+    public boolean forceResetMessages(String langCode) {
+        String fileName = langCode.endsWith(".yml") ? langCode : langCode + ".yml";
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        File diskFile = new File(messagesFolder, fileName);
+
+        if (diskFile.exists()) {
+            diskFile.delete();
+        }
+        extractResource("messages/" + fileName, diskFile);
+
+        if (currentLang.equalsIgnoreCase(langCode)) {
+            loadLanguage();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Force-reset (overwrite) ALL default language files from JAR,
+     * then reloads the active language into memory.
+     *
+     * @return the number of language files that were reset
+     */
+    public int forceResetAllMessages() {
+        String[] defaults = { "en", "es", "pt", "ja", "ru" };
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+
+        for (String lang : defaults) {
+            File diskFile = new File(messagesFolder, lang + ".yml");
+            extractResource("messages/" + lang + ".yml", diskFile);
+        }
+
+        loadLanguage();
+        return defaults.length;
     }
 }

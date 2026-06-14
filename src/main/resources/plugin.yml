@@ -30,6 +30,7 @@ permissions:
       xsetwarps.bypass-cooldown: true
       xsetwarps.export: true
       xsetwarps.import: true
+      xsetwarps.admin.forcemessages: true
   xsetwarps.admin:
     description: Permission to use admin commands
     default: op
@@ -41,11 +42,15 @@ permissions:
       xsetwarps.bypass-cooldown: true
       xsetwarps.export: true
       xsetwarps.import: true
+      xsetwarps.admin.forcemessages: true
   xsetwarps.export:
     description: Permission to export warps
     default: op
   xsetwarps.import:
     description: Permission to import warps
+    default: op
+  xsetwarps.admin.forcemessages:
+    description: Permission to use the forcemessages command
     default: op
   xsetwarps.setwarp:
     description: Permission to set warps

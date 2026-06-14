@@ -36,6 +36,9 @@ public class WarpTabCompleter implements TabCompleter {
 
                 if (isAdmin) {
                     subCommands.addAll(Arrays.asList("reload", "update", "version", "locate", "setwarpcooldown"));
+                    if (sender.hasPermission("xsetwarps.admin.forcemessages")) {
+                        subCommands.add("forcemessages");
+                    }
                 }
                 if (canExport) {
                     subCommands.add("export");
@@ -68,6 +71,10 @@ public class WarpTabCompleter implements TabCompleter {
                     }
                     StringUtil.copyPartialMatches(args[1], completions, completions);
                     Collections.sort(completions);
+                } else if (args[0].equalsIgnoreCase("forcemessages")) {
+                    // Suggest: new, keep
+                    StringUtil.copyPartialMatches(args[1], Arrays.asList("new", "keep"), completions);
+                    Collections.sort(completions);
                 } else if (args[0].equalsIgnoreCase("setwarpcooldown")) {
                     // Suggest warp names
                     for (Warp warp : plugin.getWarpManager().getAllWarps()) {
@@ -79,6 +86,15 @@ public class WarpTabCompleter implements TabCompleter {
             } else if (args.length == 3 && args[0].equalsIgnoreCase("setwarpcooldown")) {
                 StringUtil.copyPartialMatches(args[2], Arrays.asList("default", "0", "5", "10", "30", "60"), completions);
                 Collections.sort(completions);
+            } else if (args.length == 3 && args[0].equalsIgnoreCase("forcemessages")) {
+                if (args[1].equalsIgnoreCase("new") || args[1].equalsIgnoreCase("keep")) {
+                    // Suggest: all + available languages
+                    List<String> targets = new ArrayList<>();
+                    targets.add("all");
+                    targets.addAll(plugin.getLanguageManager().getAvailableLanguages());
+                    StringUtil.copyPartialMatches(args[2], targets, completions);
+                    Collections.sort(completions);
+                }
             } else if (args.length == 3 && args[0].equalsIgnoreCase("export")) {
                 // Suggest identifiers (file names from warps/)
                 completions.addAll(plugin.getWarpManager().getIdentifiers());

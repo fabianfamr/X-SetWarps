@@ -94,3 +94,17 @@ help-setwarpcooldown: "&b/xsw setwarpcooldown <warp> <s> &f- Set per-warp cooldo
 # Import All
 import-all-no-plugins: "%prefix%&cNo supported warp plugins found on the server."
 import-all-result: "%prefix%&aFrom %plugin%: imported &e%count% &awarps."
+
+# Force Messages Command
+force-messages-usage: "&7Usage: &e/xsw forcemessages <new|keep> <all|language>"
+force-messages-current: "&7Current language: &e%lang%"
+force-messages-success: "&aMessage file '&e%file%&a' updated (missing keys added) and reloaded."
+force-messages-no-changes: "&7Message file '&e%file%&7' updated on disk, but it is not the active language."
+force-messages-all: "&aForce-updated &e%count%&a language file(s) with missing keys."
+force-messages-reset-success: "&aMessage file '&e%file%&a' regenerated from defaults and reloaded."
+force-messages-reset-no-active: "&7Message file '&e%file%&7' regenerated from defaults, but it is not the active language."
+force-messages-reset-all: "&aRegenerated &e%count%&a language file(s) from defaults."
+force-messages-invalid-mode: "&cInvalid mode. Use &enew&c or &ekeep&c."
+
+# Help additions (forcemessages)
+help-forcemessages: "&b/xsw forcemessages <new|keep> <all|lang> &f- Force update messages"
