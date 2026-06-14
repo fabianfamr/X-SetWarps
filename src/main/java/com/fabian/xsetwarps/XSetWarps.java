@@ -17,6 +17,7 @@ import com.fabian.xsetwarps.utils.DebugLogger;
 import com.fabian.xsetwarps.utils.TeleportEffects;
 import com.fabian.xsetwarps.utils.UpdateChecker;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -157,19 +158,26 @@ public class XSetWarps extends JavaPlugin {
         String version = getDescription().getVersion();
         String lang = getConfig().getString("language", "EN").toUpperCase();
 
-        getLogger().info(" ----------------------------------------------");
-        getLogger().info("   Enabled v" + version + "! Enjoy warping!");
-        getLogger().info("   Storage: YAML | Language: " + lang);
-        getLogger().info(" ----------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8]   &aEnabled v" + version + "! Enjoy warping!"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8]   &fStorage: &eYAML &7| &fLanguage: &e" + lang));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8] &7----------------------------------------------"));
     }
 
     @Override
     public void onDisable() {
         DebugLogger.debug("Init", "Plugin disabling...");
 
-        getLogger().info(" ----------------------------------------------");
-        getLogger().info("   Disabled v" + getDescription().getVersion() + "! Out.");
-        getLogger().info(" ----------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8]   &cDisabled v" + getDescription().getVersion() + "! Out."));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-SetWarps&8] &7----------------------------------------------"));
     }
 
     private void setupMetrics() {
