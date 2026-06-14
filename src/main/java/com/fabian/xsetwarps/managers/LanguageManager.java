@@ -73,7 +73,11 @@ public class LanguageManager {
             }
         }
 
-        this.messagesConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(messagesFile), StandardCharsets.UTF_8));
+        try {
+            this.messagesConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(messagesFile), StandardCharsets.UTF_8));
+        } catch (java.io.FileNotFoundException e) {
+            this.messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+        }
         this.currentLang = lang.toUpperCase();
         DebugLogger.debug("LanguageManager", "Loaded language file: " + lang + ".yml");
 
